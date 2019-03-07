@@ -16,6 +16,7 @@ import TextField from "@material-ui/core/TextField";
 
 import Grid from "@material-ui/core/Grid";
 //Firebase
+import { withFirebase } from '../Firebase';
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -49,7 +50,7 @@ class SignUpForm extends React.Component {
 
   onSubmit = e => {
     this.clearErrors();
-    this.acceptData(e);
+    this.acceptData();
   };
 
   handleClickOpen = () => {
@@ -57,24 +58,28 @@ class SignUpForm extends React.Component {
   };
 
   handleClose = (event) => {
+    this.setState({ 
+      open: false,
+  username: '',
+  email: '',
+  passwordOne: '',
+  passwordTwo: ''
+     });
+    
+  };
+
+  SendDataFirebase=()=>{
     const { username, email, passwordOne } = this.state;
 
     this.props.Firebase
     .doCreateUserWithEmailAndPassword(email, passwordOne).
     then(authUser => {
-        this.setState({ 
-          open: false,
-      username: '',
-      email: '',
-      passwordOne: '',
-      passwordTwo: ''
-         });
+        this.handleClose();
       })
       .catch(error => {
         console.log(error);
       })
 
-    
   };
 
   clearErrors = () => {
@@ -89,7 +94,7 @@ class SignUpForm extends React.Component {
     });
   }
 
-  acceptData = (e) => {
+  acceptData = () => {
     if (this.state.username === "") {
       this.setState({
         isError: true,
@@ -125,7 +130,7 @@ class SignUpForm extends React.Component {
     this.setState({
     }, () => {
       if (!this.state.isError) {
-        this.handleClose(e);
+        this.SendDataFirebase();
       }
     });
 
@@ -253,4 +258,6 @@ SignUpForm.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles()(SignUpForm);
+const SignUpFormBase = withFirebase(SignUpForm);
+
+export default withStyles()(SignUpFormBase);

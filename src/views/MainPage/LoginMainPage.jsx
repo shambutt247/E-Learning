@@ -18,22 +18,47 @@ import imageAvatar from "assets/img/faces/avatar.jpg";
 import image from "assets/img/bg7.jpg";
 import Paper from '@material-ui/core/Paper';
 import SignUpForm from "./SignUpForm.jsx";
-import { FirebaseContext } from '../Firebase';
+import { withFirebase } from '../Firebase';
+import TextField from "@material-ui/core/TextField";
 
 class LoginMainPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      email:"",
+      password:"",
+      error:""
     };
   }
-  componentDidMount() {
+  componentDidMount = () => {
 
   }
-  SignInCheck(){
-    //Check Account then Proceed to Link
-    //else
-    //Issue Red Flags
+
+  SignInCheck = () => {
+    const { email, password } = this.state;
+
+    this.props.Firebase
+    .doSignInWithEmailAndPassword(email, password)
+    .then(() => {
+      this.LoggedIn();
+    })
+    .catch(error => {
+      this.setState({ error });
+    });
   }
+
+  LoggedIn= () =>{
+    this.setState({
+      email:"",
+      password:""
+    });
+    //Onto Next Page Logged In
+  }
+  change = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
   render() {
     const { classes, ...rest  } = this.props;
     return (
@@ -41,9 +66,7 @@ class LoginMainPage extends React.Component {
       <Header
           color="transparent"
           brand="E-Learning Portal !"
-          rightLinks={<FirebaseContext.Consumer>
-      {Firebase => <SignUpForm Firebase={Firebase} />}
-    </FirebaseContext.Consumer>}
+          rightLinks={<SignUpForm />}
           fixed
           changeColorOnScroll={{
             height: 200,
@@ -68,26 +91,26 @@ class LoginMainPage extends React.Component {
                       <h3 className={classes.title}>
                         <b>Sign in</b>
                       </h3>
-                      <CustomInput
-                        labelText="Account Name or Roll Number"
-                        id="email"
-                        formControlProps={{
-                          fullWidth: true
-                        }}
-                        inputProps={{
-                          type: "regular"
-                        }}
-                      />
-                      <CustomInput
-                        labelText="Password"
-                        id="password"
-                        formControlProps={{
-                          fullWidth: true
-                        }}
-                        inputProps={{
-                          type: "password"
-                        }}
-                      />
+                      <TextField
+                  name="email"
+                  label="Email"
+                  className={classes.textField}
+                  hintText="Email"
+                  onChange={e => this.change(e)}
+                  value={this.state.email}
+                  fullWidth
+                />
+                <div style={{ marginTop: "10px"}} />
+                <TextField
+                  name="password"
+                  label="Password"
+                  className={classes.textField}
+                  hintText="Password"
+                  onChange={e => this.change(e)}
+                  value={this.state.Password}
+                  fullWidth
+                />
+                <div style={{ marginTop: "5px"}} />
                       <font size="2">
                         No Account? </font>
                         <font size="2" color="blue">
@@ -115,4 +138,6 @@ class LoginMainPage extends React.Component {
   }
 }
 
-export default withStyles(loginPageStyle)(LoginMainPage);
+const LoginMainPageBase = withFirebase(LoginMainPage);
+
+export default withStyles(loginPageStyle)(LoginMainPageBase);
