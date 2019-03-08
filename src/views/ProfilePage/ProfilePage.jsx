@@ -13,7 +13,6 @@ import Footer from "components/Footer/Footer.jsx";
 import Button from "components/CustomButtons/Button.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
-import HeaderLinks from "components/Header/HeaderLinks.jsx";
 import NavPills from "components/NavPills/NavPills.jsx";
 import Parallax from "components/Parallax/Parallax.jsx";
 
@@ -29,10 +28,17 @@ import work2 from "assets/img/examples/clem-onojeghuo.jpg";
 import work3 from "assets/img/examples/cynthia-del-rio.jpg";
 import work4 from "assets/img/examples/mariya-georgieva.jpg";
 import work5 from "assets/img/examples/clem-onojegaw.jpg";
-
 import profilePageStyle from "assets/jss/material-kit-react/views/profilePage.jsx";
 
+import Signout from "../LogOut/logout.jsx";
+
 class ProfilePage extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+  componentDidMount = () => {
+  }
+  
   render() {
     const { classes, ...rest } = this.props;
     const imageClasses = classNames(
@@ -44,9 +50,9 @@ class ProfilePage extends React.Component {
     return (
       <div>
         <Header
-          color="transparent"
-          brand="Material Kit React"
-          rightLinks={<HeaderLinks />}
+          color="white"
+          brand="Welcome"
+          rightLinks={<Signout />}
           fixed
           changeColorOnScroll={{
             height: 200,

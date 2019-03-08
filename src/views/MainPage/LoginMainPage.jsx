@@ -1,22 +1,15 @@
 import React from "react";
-import { Link } from "react-router-dom";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import GridContainer from "../../components/Grid/GridContainer.jsx";
 import GridItem from "../../components/Grid/GridItem.jsx";
-import Grid from "@material-ui/core/Grid";
 import Button from "components/CustomButtons/Button.jsx";
 import Card from "../../components/Card/Card.jsx";
 import CardBody from "../../components/Card/CardBody.jsx";
 import CardFooter from "../../components/Card/CardFooter.jsx";
-import CustomInput from "../../components/CustomInput/CustomInput.jsx";
-import CustomHeaderLinks from "components/Header/CustomHeaderLinks.jsx";
 import Header from "components/Header/Header.jsx";
-import typographyStyle from "assets/jss/material-kit-react/views/componentsSections/typographyStyle.jsx";
 import loginPageStyle from "../../assets/jss/material-kit-react/views/loginPage.jsx";
-import imageAvatar from "assets/img/faces/avatar.jpg";
 import image from "assets/img/bg7.jpg";
-import Paper from '@material-ui/core/Paper';
 import SignUpForm from "./SignUpForm.jsx";
 import { withFirebase } from '../Firebase';
 import TextField from "@material-ui/core/TextField";
@@ -27,11 +20,22 @@ class LoginMainPage extends React.Component {
     this.state = {
       email:"",
       password:"",
-      error:""
+      err:"",
+      failedlogin:false,
+      authUser:null
     };
   }
   componentDidMount = () => {
+    this.listener = this.props.Firebase.auth.onAuthStateChanged(authUser => {
+      authUser
+        ? this.setState({ authUser },()=>{console.log(authUser)})
+        : this.setState({ authUser: null },()=>{console.log(authUser)});
+    });
+  }
+  
 
+  componentWillUnmount = () => {
+    this.listener();
   }
 
   SignInCheck = () => {
@@ -43,16 +47,24 @@ class LoginMainPage extends React.Component {
       this.LoggedIn();
     })
     .catch(error => {
-      this.setState({ error });
+      this.FailedLogin(error.message);
     });
   }
 
+  FailedLogin = (err) =>{
+    this.setState({
+      err:err,
+      failedlogin:true
+    },()=>{
+      console.log(this.state.error);
+    });
+  }
   LoggedIn= () =>{
     this.setState({
       email:"",
       password:""
     });
-    //Onto Next Page Logged In
+    this.props.history.push('/profile-page');
   }
   change = e => {
     this.setState({
@@ -109,6 +121,8 @@ class LoginMainPage extends React.Component {
                   onChange={e => this.change(e)}
                   value={this.state.Password}
                   fullWidth
+                  error={this.state.failedlogin}
+                  helperText={this.state.err}
                 />
                 <div style={{ marginTop: "5px"}} />
                       <font size="2">
@@ -118,14 +132,13 @@ class LoginMainPage extends React.Component {
                         </font>
                     
                     </CardBody>
-                    <CardFooter className={classes.cardFooter}>
-                      <Link to={"/main-page"} className={classes.link}>
-                        <GridItem>
+                    <CardFooter className={classes.cardFooter} justifyContent="center">
+                      
                           <Button color="info" onClick={this.SignInCheck}>
                             Next
                           </Button>
-                        </GridItem>
-                      </Link>
+                        
+                      
                     </CardFooter>
                   </form>
                 </Card>
@@ -138,6 +151,5 @@ class LoginMainPage extends React.Component {
   }
 }
 
-const LoginMainPageBase = withFirebase(LoginMainPage);
 
-export default withStyles(loginPageStyle)(LoginMainPageBase);
+export default withStyles(loginPageStyle)(withFirebase(LoginMainPage));

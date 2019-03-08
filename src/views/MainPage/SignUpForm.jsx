@@ -6,11 +6,9 @@ import Button from "@material-ui/core/Button";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Slide from "@material-ui/core/Slide";
-import IconButton from "@material-ui/core/IconButton";
 import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import AddIcon from "@material-ui/icons/Add";
 
 import TextField from "@material-ui/core/TextField";
 
@@ -258,6 +256,5 @@ SignUpForm.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-const SignUpFormBase = withFirebase(SignUpForm);
 
-export default withStyles()(SignUpFormBase);
+export default withStyles()(withFirebase(SignUpForm));

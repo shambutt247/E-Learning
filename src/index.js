@@ -14,6 +14,7 @@ import LoginPage from "views/LoginPage/LoginPage.jsx";
 
 //Firebase initialization
 import Firebase, { FirebaseContext } from "views/Firebase";
+import { withAuthentication } from './views/Auth';
 
 var hist = createBrowserHistory();
 
