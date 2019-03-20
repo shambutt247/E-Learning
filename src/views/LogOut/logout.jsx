@@ -1,6 +1,5 @@
 import React from "react";
-
-import { Link } from "react-router-dom";
+import history from "../../history";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 import List from "@material-ui/core/List";
@@ -9,33 +8,69 @@ import ListItem from "@material-ui/core/ListItem";
 import Email from "@material-ui/icons/Email";
 // core components
 import CustomDropdown from "components/CustomDropdown/CustomDropdown.jsx";
-import Button from "components/CustomButtons/Button.jsx";
-import { withFirebase } from '../Firebase';
 import navbarsStyle from "assets/jss/material-kit-react/views/componentsSections/navbarsStyle.jsx";
-
+import Avatar from '@material-ui/core/Avatar';
 import profileImage from "assets/img/faces/avatar.jpg";
+import Button from '@material-ui/core/Button';
+import IconButton from "@material-ui/core/IconButton";
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
+import MenuItem from '@material-ui/core/MenuItem';
+import MenuList from '@material-ui/core/MenuList';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+
+import fire from "../Firebase/fire.js";
 
 class logout extends React.Component {
    constructor(props) {
       super(props);
+      this.state = {
+         authUser: null,
+         profileName: null,
+         open:false
+      };
+   }
+   componentDidMount = () => {
+
+      var userstring = localStorage.getItem("uid");
+      var user = JSON.parse(userstring);
+      var name=null;
+      if (user != null) {
+         name = user.displayName;
+      }
+      if(name!==null){
+         var acr=name.split(' ').map(x => x[0]).join('');
+         this.setState({
+            profileName:acr
+         });
+      }
       
-    }
+   }
+
+   handleToggle = () => {
+      this.setState(state => ({ open: !state.open }));
+    };
   
-loggingOut=()=>{
-   console.log("workd")
-   {return(
-      this.props.Firebase.doSignOut.then(function() {
-         console.log("worked")
-       }).catch(function(error) {
-         console.log(error)
-       });
-      
-   )}
-   
-};
+    handleClose = event => {
+      this.setState({ open: false });
+    };
+
+   loggingOut = () => {
+      fire.auth().signOut().then(function () {
+         localStorage.removeItem("uid");
+         history.push('/');
+
+      }).catch(function (error) {
+         console.log(error);
+      });
+   };
+
 
    render() {
       const { classes } = this.props;
+      const { open } = this.state;
       return (
          <List className={classes.list}>
             <ListItem className={classes.listItem}>
@@ -59,46 +94,50 @@ loggingOut=()=>{
                     </Button>
             </ListItem>
             <ListItem className={classes.listItem}>
-               <Button
-                  justIcon
-                  round
-                  href="#pablo"
-                  className={classes.notificationNavLink}
+               <IconButton
+               justIcon
                   onClick={e => e.preventDefault()}
                   color="white"
+
                >
                   <Email className={classes.icons} />
-               </Button>
+               </IconButton>
             </ListItem>
             <ListItem className={classes.listItem}>
-               <CustomDropdown
-                  left
-                  caret={false}
-                  hoverColor="white"
-                  buttonText={
-                     <img
-                        src={profileImage}
-                        className={classes.img}
-                        alt="profile"
-                     />
-                  }
-                  buttonProps={{
-                     className:
-                        classes.navLink + " " + classes.imageDropdownButton,
-                     color: "transparent"
-                  }}
-                  dropdownList={[
-                     "Me",
-                     "Settings",
-                     <li><a onClick={this.loggingOut}>Action</a></li>
-                  ]}
-               />
+            
+          <IconButton
+          buttonRef={node => {
+              this.anchorEl = node;
+            }}
+          onClick={()=>this.handleToggle()}
+          style={{padding:'0'}}
+        >
+        <Avatar>{this.state.profileName}</Avatar>
+        </IconButton>
+          <Popper open={open} anchorEl={this.anchorEl} placement={'bottom-start'} transition disablePortal>
+            {({ TransitionProps }) => (
+              <Grow
+                {...TransitionProps}
+                style={{ transformOrigin: 'bottom' }}
+              >
+                <Paper>
+                  <ClickAwayListener onClickAway={()=>this.handleClose()}>
+                    <MenuList>
+                      <MenuItem onClick={()=>this.handleClose()}>Profile</MenuItem>
+                      <MenuItem onClick={()=>this.handleClose()}>My account</MenuItem>
+                      <MenuItem onClick={()=>this.loggingOut()}>Logout</MenuItem>
+                    </MenuList>
+                  </ClickAwayListener>
+                </Paper>
+              </Grow>
+            )}
+          </Popper>
             </ListItem>
          </List>
       );
    }
 }
 
-export default withStyles(navbarsStyle)(withFirebase(logout));
+export default withStyles(navbarsStyle)(logout);
 
 

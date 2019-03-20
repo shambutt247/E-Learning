@@ -10,11 +10,17 @@ import Dialog from "@material-ui/core/Dialog";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
 import TextField from "@material-ui/core/TextField";
-
+import { withSnackbar } from 'notistack';
 import Grid from "@material-ui/core/Grid";
 //Firebase
-import { withFirebase } from '../Firebase';
+import fire from "../Firebase/fire.js";
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -29,10 +35,12 @@ class SignUpForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      username: '',
+      name: '',
+      lastname: '',
       email: '',
       passwordOne: '',
       passwordTwo: '',
+      typeuser: "student",
       error: "",
       open: false,
       isError: false,
@@ -41,7 +49,8 @@ class SignUpForm extends React.Component {
       isEmail: false,
       isEmailErrorText: "",
       isPasswordError: false,
-      isPasswordErrorText: ""
+      isPasswordErrorText: "",
+      approvedMessage:""
     };
   }
 
@@ -55,28 +64,50 @@ class SignUpForm extends React.Component {
     this.setState({ open: true });
   };
 
-  handleClose = (event) => {
-    this.setState({ 
+  handleClose = () => {
+    this.setState({
       open: false,
-  username: '',
-  email: '',
-  passwordOne: '',
-  passwordTwo: ''
-     });
-    
+      name: '',
+      lastname: '',
+      email: '',
+      passwordOne: '',
+      passwordTwo: '',
+      actor: ''
+    });
+
   };
 
-  SendDataFirebase=()=>{
-    const { username, email, passwordOne } = this.state;
+  SendDataFirebase = () => {
+    const { name, lastname, email, passwordOne, actor } = this.state;
 
-    this.props.Firebase
-    .doCreateUserWithEmailAndPassword(email, passwordOne).
-    then(authUser => {
+    var fullname = `${name} ${lastname}`;
+    var user = null;
+    var uniqueID = null;
+    fire.auth().createUserWithEmailAndPassword(email, passwordOne)
+      .then(function () {
+        user = fire.auth().currentUser;
+      })
+      .then(function () {
+        user.updateProfile({
+          displayName: fullname
+        });
+        uniqueID = user.uid
+
+        fire.database().ref('users/' + uniqueID).set({
+          name: name,
+          lastName: lastname,
+          email: email,
+          userType: actor
+        });
+      })
+      .then(() => {
         this.handleClose();
+        this.handleSnack("Sign Up Successful!!","success");
       })
       .catch(error => {
-        console.log(error);
-      })
+        this.setState({ error: error.message }, () => { console.log(this.state.error) });
+        this.handleSnack(error.message,"error");
+      });
 
   };
 
@@ -88,16 +119,17 @@ class SignUpForm extends React.Component {
       isEmail: false,
       isEmailErrorText: "",
       isPasswordError: false,
-      isPasswordErrorText: ""
+      isPasswordErrorText: "",
+      errorActor: false
     });
   }
 
   acceptData = () => {
-    if (this.state.username === "") {
+    if (this.state.name === "") {
       this.setState({
         isError: true,
         isUserNameError: true,
-        isUserNameErrorText: "Username cannot be empty"
+        isUserNameErrorText: "name cannot be empty"
       });
     }
 
@@ -106,6 +138,13 @@ class SignUpForm extends React.Component {
         isError: true,
         isEmail: true,
         isEmailErrorText: "Email Cannot be empty"
+      });
+    }
+
+    if (this.state.actor === "") {
+      this.setState({
+        isError: true,
+        errorActor: true
       });
     }
 
@@ -140,8 +179,13 @@ class SignUpForm extends React.Component {
     });
   };
 
+      handleSnack = (mess,variant) =>{
+        this.props.enqueueSnackbar(mess, {variant});
+      }
+
   render() {
     const { classes } = this.props;
+    const {errorActor}=this.state;
     return (
       <div>
         <Button
@@ -158,7 +202,7 @@ class SignUpForm extends React.Component {
           onClose={this.handleClose}
           TransitionComponent={Transition}
         >
-          <DialogTitle>{this.props.titlePage}</DialogTitle>
+          <DialogTitle> </DialogTitle>
           <DialogContent>
             <Grid
               container
@@ -167,17 +211,29 @@ class SignUpForm extends React.Component {
             >
               <Grid item xs>
                 <TextField
-                  name="username"
-                  label="UserName"
+                  name="name"
+                  label="Name"
                   className={classes.textField}
-                  hintText="User Name"
+                  hintText="Name"
                   onChange={e => this.change(e)}
                   variant="outlined"
-                  value={this.state.username}
+                  value={this.state.name}
                   fullWidth
                   required
                   error={this.state.isUserNameError}
                   helperText={this.state.isUserNameErrorText}
+                />
+              </Grid>
+              <Grid item xs>
+                <TextField
+                  name="lastname"
+                  hintText="lastname"
+                  label="Last Name"
+                  className={classes.textField}
+                  variant="outlined"
+                  value={this.state.lastname}
+                  onChange={e => this.change(e)}
+                  fullWidth
                 />
               </Grid>
               <Grid item xs>
@@ -195,33 +251,10 @@ class SignUpForm extends React.Component {
                   helperText={this.state.isEmailErrorText}
                 />
               </Grid>
+
+              <div style={{ marginTop: "10px", marginBottom: "5px" }} />
+
             </Grid>
-            <TextField
-              name="passwordOne"
-              hintText="Password"
-              label="Password"
-              className={classes.textField}
-              value={this.state.passwordOne}
-              variant="outlined"
-              required
-              onChange={e => this.change(e)}
-              fullWidth
-            />
-            <div style={{ marginTop: "10px", marginBottom: "5px" }} />
-            <TextField
-              name="passwordTwo"
-              hintText="Confirm Password"
-              label="Confirm Password"
-              className={classes.textField}
-              value={this.state.passwordTwo}
-              variant="outlined"
-              onChange={e => this.change(e)}
-              fullWidth
-              required
-              error={this.state.isPasswordError}
-              helperText={this.state.isPasswordErrorText}
-            />
-            <div style={{ marginTop: "20px", marginBottom: "20px" }} />
 
             <Grid
               container
@@ -229,11 +262,49 @@ class SignUpForm extends React.Component {
               style={{ marginTop: "10px", marginBottom: "5px" }}
             >
               <Grid item xs>
+                <TextField
+                  name="passwordOne"
+                  hintText="Password"
+                  label="Password"
+                  className={classes.textField}
+                  value={this.state.passwordOne}
+                  variant="outlined"
+                  required
+                  onChange={e => this.change(e)}
+                  fullWidth
+                />
               </Grid>
               <Grid item xs>
-
+                <TextField
+                  name="passwordTwo"
+                  hintText="Confirm Password"
+                  label="Confirm Password"
+                  className={classes.textField}
+                  value={this.state.passwordTwo}
+                  variant="outlined"
+                  onChange={e => this.change(e)}
+                  fullWidth
+                  required
+                  error={this.state.isPasswordError}
+                  helperText={this.state.isPasswordErrorText}
+                />
               </Grid>
             </Grid>
+            <div style={{ marginTop: "15px" }} />
+            <FormControl component="fieldset" required error={errorActor}>
+              <FormLabel component="legend">I am a {this.state.actor}</FormLabel>
+              <RadioGroup
+                aria-label="Gender"
+                name="actor"
+                className={classes.group}
+                value={this.state.actor}
+                onChange={e => this.change(e)}
+              >
+                <FormControlLabel value="teacher" control={<Radio />} label="Teacher" />
+                <FormControlLabel value="student" control={<Radio />} label="Student" />
+              </RadioGroup>
+              <FormHelperText>Select at least one</FormHelperText>
+            </FormControl>
           </DialogContent>
           <AppBar style={{ position: "relative" }}>
             <Toolbar variant="dense">
@@ -253,8 +324,12 @@ class SignUpForm extends React.Component {
 }
 
 SignUpForm.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired
+  
 };
 
-
-export default withStyles()(withFirebase(SignUpForm));
+const SignUpForm1 = withSnackbar(SignUpForm);
+export default withStyles()(SignUpForm1);
+ /*
+        */
