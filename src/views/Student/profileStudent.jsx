@@ -14,8 +14,24 @@ import profilePageStyle from "assets/jss/material-kit-react/views/profilePage.js
 class profileStudent extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      Name:null,
+      Acr:null
+    };
   }
   componentDidMount = () => {
+    var user = localStorage.getItem("uid");
+    var user1 = JSON.parse(user);
+    console.log(user1);
+    var nameInitial=user1.displayName;
+    var acr=nameInitial.split(' ').map(x => x[0]).join('');
+    var PhtoURL=user1.photoURL
+    this.setState({
+      Name:user1.displayName,
+      Acr:acr
+    },()=>{
+      console.log(this.state.Name);
+    });
   }
   
   render() {
@@ -35,7 +51,7 @@ class profileStudent extends React.Component {
                       <img src={profile} alt="..." className={imageClasses} />
                     </div>
                     <div className={classes.name}>
-                      <h3 className={classes.title}>Christian Louboutin</h3>
+                      <h3 className={classes.title}>{this.state.Name}</h3>
                       <h6>DESIGNER</h6>
                       <Button justIcon link className={classes.margin5}>
                         <i className={"fab fa-twitter"} />
