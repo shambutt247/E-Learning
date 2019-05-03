@@ -29,23 +29,34 @@ class logout extends React.Component {
       this.state = {
          authUser: null,
          profileName: null,
-         open:false
+         open:false,
+         profImage:null,
+         imagep:false
       };
    }
    componentDidMount = () => {
 
       var userstring = localStorage.getItem("uid");
       var user = JSON.parse(userstring);
-      var name=null;
-      if (user != null) {
-         name = user.displayName;
-      }
-      if(name!==null){
-         var acr=name.split(' ').map(x => x[0]).join('');
+      var Phto=user.photoURL;
+      if(Phto===null){
+         var name=null;
+         if (user != null) {
+            name = user.displayName;
+         }
+         if(name!==null){
+            var acr=name.split(' ').map(x => x[0]).join('');
+            this.setState({
+               profileName:acr
+            });
+         }
+      }else{
          this.setState({
-            profileName:acr
+            profImage:Phto,
+            imagep:true
          });
       }
+      
       
    }
 
@@ -112,7 +123,12 @@ class logout extends React.Component {
           onClick={()=>this.handleToggle()}
           style={{padding:'0'}}
         >
-        <Avatar>{this.state.profileName}</Avatar>
+        {this.state.imagep ? (
+         <Avatar src={this.state.profImage}/>
+        ):(
+         <Avatar>{this.state.profileName}</Avatar>
+        )}
+        
         </IconButton>
           <Popper open={open} anchorEl={this.anchorEl} placement={'bottom-start'} transition disablePortal>
             {({ TransitionProps }) => (

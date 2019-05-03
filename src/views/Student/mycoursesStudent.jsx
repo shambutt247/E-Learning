@@ -23,6 +23,8 @@ import { withSnackbar } from 'notistack';
 //firebase
 import fire from "../Firebase/fire.js";
 
+import history from "../../history";
+
 class mycoursesStudent extends React.Component {
   constructor(props) {
     super(props);
@@ -80,6 +82,15 @@ class mycoursesStudent extends React.Component {
     this.props.enqueueSnackbar(mess, {variant});
   }
 
+  openSubject = (subjectID) =>{
+    history.push({
+      pathname: '/subject-home',
+      search: '?query=abc',
+      state: {  subid: subjectID,
+                actor:"student" }
+    });
+  }
+
   render() {
     const { classes, ...rest } = this.props;
     return (
@@ -92,7 +103,7 @@ class mycoursesStudent extends React.Component {
             <div key={details.subid}>
               <Grid item xs={5}>
                 <Card style={{ width: '350px', marginBottom: '30px' }} elevation={2}>
-                  <CardActionArea>
+                  <CardActionArea onClick={()=>this.openSubject(details.subid)}>
                     <CardMedia
                       objectFit="cover"
                       image={require("assets/img/bg.jpg")}

@@ -43,7 +43,7 @@ class moredetailsSubject extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      open: this.props.opens,
+      open: false,
       isError: false,
       subo:null
       /*
