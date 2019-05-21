@@ -78,7 +78,12 @@ class registerSubjects extends React.Component {
         duration:duration,
         active:true,
         teacherid:userteacher.uid,
-        sstrenght:0
+        sstrenght:0,
+        review:{
+          average:0,
+          total:0,
+          RT:0
+        }
       };
       var updates = {};
       updates['subjects/' + newSubkey] = postSubject;

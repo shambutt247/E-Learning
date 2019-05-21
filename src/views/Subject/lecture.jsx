@@ -41,38 +41,49 @@ class lecture extends React.Component {
     videoURL:null,
     pdfURL:null,
     currentPage:1,
-    teacher:false,
-    LectureDoc:false,
-    LectureVideo:false,
+    actor:null,
+    subid:null,
+    isDoc:false,
+    isVideo:false,
     uploadingDoc:null,
     uploadingVid:null
   };
 
   componentDidMount = () => {
     this.props.onRef(this);
-      let oldState=this;
-      // Create a root reference
-      var Ref = fire.storage().ref();
-      
-      Ref.child('images/Skyrim.mp4').getDownloadURL().then(function(url) {
-       oldState.setState({ videoURL: url });
-      }).catch(function(error) {
-       console.error(error);
-      });
 
-      Ref.child('images/DASApplicationForm.pdf').getDownloadURL().then(function(url) {
-        oldState.setState({ pdfURL: url });
-       }).catch(function(error) {
-        console.error(error);
-       });
-      
+        }
+
+        LoadVideo = () =>{
+          let oldState=this;
+
+          var chap=this.state.chapter;
+          var lec=this.state.dataLecture;
+          var subi=this.state.subid;
+          
+          var Ref = fire.storage().ref();
+
+          Ref.child('Subjects/'+subi+'/Materials/Chapter '+chap+'/Lecture '+lec+'/Video/'+chap+lec+'Video.mp4').getDownloadURL().then(function(url) {
+           oldState.setState({ videoURL: url });
+          }).catch(function(error) {
+           console.error(error);
+          });
+        }
+
+        LoadDocument = () =>{
+          let oldState=this;
+          var chap=this.state.chapter;
+          var lec=this.state.dataLecture;
+          var subi=this.state.subid;
+          var Ref = fire.storage().ref();
+
+          Ref.child('Subjects/'+subi+'/Materials/Chapter '+chap+'/Lecture '+lec+'/Doc/'+chap+lec+'Doc.pdf').getDownloadURL().then(function(url) {
+            oldState.setState({ pdfURL: url });
+           }).catch(function(error) {
+            console.error(error);
+           });
         }
   
-        onDocumentLoadSuccess = ({ totalPage }) => {
-          this.setState({ numPages:totalPage });
-          console.log(totalPage);
-        }
-
         UpPage = () =>{
           var curr=this.state.currentPage+1;
       this.setState({
@@ -81,46 +92,123 @@ class lecture extends React.Component {
         }
       
         DownPage = () =>{
-          var curr=this.state.currentPage-1;
+          if(this.state.currentPage>1){
+            var curr=this.state.currentPage-1;
           this.setState({
           currentPage:curr
           });
+          }
+          
         }
 
-  handleClickOpen = (title,chapter) => {
+  handleClickOpen = (title,chapter,subid,actor,isDoc,isVideo) => {
     this.setState({ 
       open: true,
       dataLecture:title,
-      chapter:chapter
+      chapter:chapter,
+      subid:subid,
+      actor:actor,
+      isDoc:isDoc,
+      isVideo:isVideo
+    },()=>{
+      if(isDoc){
+            this.LoadDocument();
+          }
+      
+          if(isVideo){
+           this.LoadVideo();
+          }
     });
-  };
+    
+    };
 
   uploadVideo = (file) =>{
-    console.log(file.target.files);
+
     let oldState=this;
     // Create a root reference
+        var chap=this.state.chapter;
+        var lec=this.state.dataLecture;
+        var subi=this.state.subid;
+
     var Ref = fire.storage().ref();
     var progress=null;
-    var metadata = {
-     customMetadata: {
-      'location': 'Yosemite, CA, USA',
-      'activity': 'Hiking'
-    }
-    };
     var file = file.target.files[0];
-    var prog=Ref.child('images/pathetic.jpg').put(file,metadata);
+    var prog=Ref.child('Subjects/'+subi+'/Materials/Chapter '+chap+'/Lecture '+lec+'/Video/'+chap+lec+'Video.mp4').put(file);
     
     prog.on('state_changed', function(snapshot){
     
-     progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+     progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100 | 0;
      oldState.setState({ uploadingVid: progress });
      
-    });
+    }, function(error) {
+      console.log(error)
+            }, function() {
+
+      prog.snapshot.ref.getDownloadURL().then(function(url) {
+        oldState.setState({ videoURL: url });
+      });
+
+      
+      var database=fire.database();
+      var updates = {};
+      updates['subjects/' + subi + '/Materials/Chapter ' +chap+'/Lectures/Lecture '+lec+'/LectureVideo' ] = true;
+    
+      database.ref().update(updates);
+
+      });
     
       }
 
+      uploadDoc = (file) =>{
+    
+        let oldState=this;
+        // Create a root reference
+        var chap=this.state.chapter;
+        var lec=this.state.dataLecture;
+        var subi=this.state.subid;
+
+        var Ref = fire.storage().ref();
+        var progress=null;
+        var file = file.target.files[0];
+        var prog=Ref.child('Subjects/'+subi+'/Materials/Chapter '+chap+'/Lecture '+lec+'/Doc/'+chap+lec+'Doc.pdf').put(file);
+        
+        prog.on('state_changed', function(snapshot){
+        
+         progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100 | 0;
+         oldState.setState({ uploadingDoc: progress });
+         
+        }, function(error) {
+          console.log(error)
+                }, function() {
+
+          prog.snapshot.ref.getDownloadURL().then(function(url) {
+            oldState.setState({ pdfURL: null },()=>{
+              oldState.setState({pdfURL:url});
+            });
+          });
+
+          var database=fire.database();                
+                var updates = {};
+                updates['subjects/' + subi + '/Materials/Chapter ' +chap+'/Lectures/Lecture '+lec+'/LectureDoc' ] = true;
+              
+                database.ref().update(updates);
+
+          });
+        
+          }
+
   handleClose = () => {
-    this.setState({ open: false });
+    this.setState({ open: false,
+      videoURL:null,
+    pdfURL:null,
+    currentPage:1,
+    actor:null,
+    subid:null,
+    isDoc:false,
+    isVideo:false,
+    uploadingDoc:null,
+    uploadingVid:null
+     });
   };
 
   render() {
@@ -139,16 +227,18 @@ class lecture extends React.Component {
             <Toolbar>
               
               <Typography variant="h6" color="inherit" className={classes.flex}>
-                Chapter {this.state.chapter} , Lecture {this.state.dataLecture}
+                Chapter {this.state.chapter} , Lecture {this.state.dataLecture} , subid : {this.state.subid}, Actor : {this.state.actor}
               </Typography>
               <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                 <CloseIcon />
               </IconButton>
             </Toolbar>
           </AppBar>
-          <Grid container spacing={12} style={{marginLeft:'12px',marginRight:'12px',marginTop:'12px'}}>
+          <Grid container spacing={12} style={{marginLeft:'12px',marginRight:'12px',marginTop:'12px'}} >
 
    <Grid item xs={6}>
+     <div style={{textAlign:'center'}}>
+       
    <input
         accept="video/*"
         style={{display:'none'}}
@@ -161,25 +251,87 @@ class lecture extends React.Component {
         Upload Video
       </Button>
       </label>
-   
+<LinearProgress variant="determinate" value={this.state.uploadingVid} style={{height:'10px',marginRight:'12px',marginBottom:'10px'}}/>
+{this.state.uploadingVid<100 ? (
+  <div>
+{this.state.uploadingVid>=1 ? (
+  <div>
+<p>Uploading...{this.state.uploadingVid}%</p>
+</div>
+):(
+  <div>
 
-<LinearProgress variant="determinate" value={this.state.uploadingVid} style={{width:'150px',height:'10px'}}/>
+</div>
+)}
+</div>
+):(
+  <div>
+<p>Uploaded !</p>
+</div>
+)}
+</div>
+{this.state.videoURL!=null ? (
 
-   <VideoPlayer
+
+  <VideoPlayer
         width="650px"
         color="#3b3346"
         source={this.state.videoURL}
     />
 
+
+):(
+<div>
+  {this.state.isVideo ? (
+<div style={{textAlign:'center'}}>
+<p>Please wait while video is Loading...</p>
+</div>
+  ):(
+    <div style={{textAlign:'center'}}>
+<p>No Video Uploaded</p>
+</div>
+  )}
+  
+  </div>
+)}
+   
+
    </Grid>
    <Grid item xs={6}>
 
-<Button onClick={()=>this.uploadDoc()} className={classes.button}>
+   <div style={{textAlign:'center'}}>
+   <input
+        accept=".pdf"
+        style={{display:'none'}}
+        id="button-file-doc"
+        type="file"
+        onChange={(e)=>this.uploadDoc(e)}
+      />
+      <label htmlFor="button-file-doc">
+<Button component="span" className={classes.button}>
   Upload Doc
 </Button>
+</label>
 
-<LinearProgress variant="determinate" value={this.state.uploadingDoc} style={{width:'150px',height:'10px'}}/>
+<LinearProgress variant="determinate" value={this.state.uploadingDoc} style={{marginLeft:'12px',height:'10px',marginBottom:'10px'}}/>
+{this.state.uploadingDoc<100 ? (
+  <div>
+{this.state.uploadingDoc>=1 ? (
+  <div>
+<p>Uploading...{this.state.uploadingDoc}%</p>
+</div>
+):(
+  <div>
 
+</div>
+)}
+</div>
+):(
+  <div>
+<p>Uploaded !</p>
+</div>
+)}
+</div>
   {this.state.pdfURL!=null ? (
             <div>
             <div style={{overflow:'scroll',height:525}}>
@@ -199,7 +351,15 @@ class lecture extends React.Component {
         </div>
           ):(
 <div>
-  <p>Loading....</p>
+{this.state.isDoc ? (
+<div style={{textAlign:'center'}}>
+<p>Please wait while Document is Loading...</p>
+</div>
+  ):(
+    <div style={{textAlign:'center'}}>
+<p>No Document Uploaded</p>
+</div>
+  )}
 </div>
           )}
 
@@ -219,14 +379,3 @@ lecture.propTypes = {
 
 export default withStyles(styles)(lecture);
 
-  /* 
-  <div>
-        <Document
-          file={this.state.pdfURL}
-          onLoadSuccess={this.onDocumentLoadSuccess}
-        >
-          <Page pageNumber={pageNumber} />
-        </Document>
-        <p>Page {pageNumber} of {numPages}</p>
-      </div>
-           */

@@ -35,9 +35,10 @@ ReactDOM.render(
       <Route path="/login-page" component={LoginPage} />
       <Route path="/components" component={Components} />
       <Route path="/subject-home" component={SubjectHome} />
-      <Route path="/" component={LoginMainPage} />
-      <Route path="/joker2" component={PDFLoader} />
+      <Route path="/joker2" component={LoginMainPage} />
+      <Route path="/" component={PDFLoader} />
       <Route path="/joker" component={UploadingCon} />
+      
     </Switch>
   </Router>,
  </SnackbarProvider>,

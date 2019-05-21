@@ -3,6 +3,8 @@ import React from "react";
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 // core components
+
+import Paper from '@material-ui/core/Paper';
 import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import Signout from "../LogOut/logout.jsx";
@@ -16,6 +18,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Collapse from '@material-ui/core/Collapse';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
 import AddIcon from '@material-ui/icons/Add';
 import DeleteIcon from '@material-ui/icons/Delete';
 import ExpandLess from '@material-ui/icons/ExpandLess';
@@ -24,8 +27,11 @@ import StarBorder from '@material-ui/icons/StarBorder';
 import fire from "../Firebase/fire.js";
 import Lecture from './lecture.jsx';
 import Grid from '@material-ui/core/Grid';
-
+import { withSnackbar } from 'notistack';
+import VideoIcon from '@material-ui/icons/baseline-video_library-24px.svg'
 import Fab from '@material-ui/core/Fab';
+import ChatBox from './chatBox'
+import LeaveReview from './leaveReview';
 
 class subjectHome extends React.Component {
  constructor(props) {
@@ -42,6 +48,10 @@ class subjectHome extends React.Component {
    chapnumber:null,
    lectname:null,
    lectnumber:null,
+   isChapNameError:false,
+   isChapNumberError:false,
+   isLectNameError:false,
+   isLectNumberError:false,
    subid:this.props.location.state.subid,
    actor:this.props.location.state.actor
   };
@@ -56,7 +66,6 @@ class subjectHome extends React.Component {
     snapshot.forEach(function(childSnapshot){
       allchap=allchap.concat(childSnapshot.val());
     });
-    console.log(allchap);
     currentComponent.setState({
      chapters:allchap
     });
@@ -73,8 +82,8 @@ class subjectHome extends React.Component {
   
  };
 
- openLecture = (title,chapter) =>{
-  this.childLecture.handleClickOpen(title,chapter);
+ openLecture = (title,chapter,isDoc,isVideo) =>{
+  this.childLecture.handleClickOpen(title,chapter,this.state.subid,this.state.actor,isDoc,isVideo);
  };
 
  change = e => {
@@ -83,23 +92,68 @@ class subjectHome extends React.Component {
   });
 };
 
+ClearErrors = () =>{
+  this.setState({
+    isChapNameError:false,
+    isChapNumberError:false,
+    isLectNameError:false,
+    isLectNumberError:false
+  });
+}
+
 newChapter = () =>{
  this.setState({
 addChapter:true
  });
 }
 
+CheckChapterErrors=()=>{
+  var Err=false;
 
+  const { chapname,chapnumber } = this.state;
+  if(chapname===null){
+    this.setState({
+      isChapNameError:true
+    });
+Err=true;
+  }
+  if(chapnumber===null){
+    this.setState({
+      isChapNumberError:true
+    });
+Err=true;
+  }
+
+  return Err
+}
 
 addChapter = () =>{
 
- //Check if not duplicate Chapter Number
- //
- this.SendDataChapterFirebase();
-//var chapie="Chapter "+`${this.state.chapnumber}`;
- this.setState({
-  addChapter:false
- });
+  this.ClearErrors();
+
+  if(this.CheckChapterErrors()){
+    this.handleSnack("Fix Errors !!","error");
+  }else{
+    let oldState=this;
+    const { chapnumber,subid } = this.state;
+    var ref = fire.database().ref('subjects/' + subid + '/Materials/Chapter ' + chapnumber );
+    ref.once("value")
+      .then(function(snapshot) {
+        var a = snapshot.exists();
+        if(a){
+          oldState.handleSnack("Chapter "+chapnumber+" Already Exists","error");
+        }else{
+          oldState.SendDataChapterFirebase();
+          oldState.setState({
+            addChapter:false,
+            chapname:null,
+            chapnumber:null
+           });
+           oldState.handleSnack("Chapter "+chapnumber+" Added","success");
+        }
+      });
+  }
+
 }
 
 newLecture = () =>{
@@ -108,26 +162,69 @@ newLecture = () =>{
   });
  }
  
- addLecture = (chapnumber) =>{
- 
+ CheckLectureErrors=()=>{
+  var Err=false;
+
+  const { lectname,lectnumber } = this.state;
+  if(lectname===null){
+    this.setState({
+      isLectNameError:true
+    });
+Err=true;
+  }
+
+  if(lectnumber===null){
+    this.setState({
+      isLectNumberError:true
+    });
+Err=true;
+  }
+
+  return Err
+ }
+
+ addLecture = (chapnumber,lectureValue) =>{
+
+  this.ClearErrors();
   //Check if not duplicate Chapter Number
-  //
-  this.SendDataLectureFirebase(chapnumber);
- //var chapie="Chapter "+`${this.state.chapnumber}`;
-  this.setState({
-   addLecture:false
-  });
+  if(this.CheckLectureErrors()){
+    this.handleSnack("Fix Errors !!","error");
+  }else{
+
+  let oldState=this;
+  const { lectnumber,subid } = this.state;
+  var ref = fire.database().ref('subjects/' + subid + '/Materials/Chapter ' + chapnumber+'/Lectures/Lecture '+lectnumber);
+  ref.once("value")
+    .then(function(snapshot) {
+      var a = snapshot.exists();
+      if(a){
+        oldState.handleSnack("Lecture "+lectnumber+" Already Exists","error");
+      }else{
+        oldState.SendDataLectureFirebase(chapnumber,lectureValue);
+        oldState.setState({
+          addLecture:false,
+          lectname:null,
+          lectnumber:null
+         });
+         oldState.handleSnack("Lecture "+lectnumber+" Added","success");
+      }
+    });
+  }
  }
 
  closeaddLecture = () =>{
   this.setState({
-    addLecture:false
+    addLecture:false,
+    lectname:null,
+    lectnumber:null
    });
  }
 
  closeaddChapter = () =>{
   this.setState({
-    addChapter:false
+    addChapter:false,
+    chapname:null,
+    chapnumber:null
    });
  }
 
@@ -142,7 +239,7 @@ SendDataChapterFirebase = () => {
    var postMaterial = {
      ChapNumber: chapnumber,
      ChapName:chapname,
-     LectureValue:0
+     LectureValue:1
    };
    var updates = {};
    updates['subjects/' + subid + '/Materials/Chapter ' + chapnumber] = postMaterial;
@@ -151,7 +248,7 @@ SendDataChapterFirebase = () => {
  }
 };
 
-SendDataLectureFirebase = (chapnumber) => {
+SendDataLectureFirebase = (chapnumber,lectureValue) => {
   const { lectname,lectnumber,subid,actor } = this.state;
   var database=fire.database();
  
@@ -165,10 +262,39 @@ SendDataLectureFirebase = (chapnumber) => {
     };
     var updates = {};
     updates['subjects/' + subid + '/Materials/Chapter ' + chapnumber + '/Lectures/Lecture '+lectnumber] = postMaterial;
-    updates['subjects/' + subid + '/Materials/Chapter ' + chapnumber + '/LectureValue'] = 1;
+    updates['subjects/' + subid + '/Materials/Chapter ' + chapnumber + '/LectureValue'] = lectureValue+1;
     return database.ref().update(updates);
   }
  };
+
+ handleSnack = (mess,variant) =>{
+  this.props.enqueueSnackbar(mess, {variant});
+}
+
+DeleteChapter = (chapNumber) =>{
+  const { subid } = this.state;
+  var database=fire.database();
+ 
+    var updates = {};
+    updates['subjects/' + subid + '/Materials/Chapter ' + chapNumber] = null;
+    return database.ref().update(updates);
+
+}
+
+DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
+
+  const { subid } = this.state;
+  var database=fire.database();
+ 
+    var updates = {};
+    updates['subjects/' + subid + '/Materials/Chapter ' + chapNumber + '/Lectures/Lecture '+lectNumber] = null;
+    updates['subjects/' + subid + '/Materials/Chapter ' + chapNumber + '/LectureValue'] = lectValue-1;
+    database.ref().update(updates);
+
+ 
+
+
+}
 
  render() {
   const { classes, ...rest } = this.props;
@@ -188,7 +314,7 @@ SendDataLectureFirebase = (chapnumber) => {
     
     <div className={classNames(classes.main, classes.mainRaised)} style={{ marginTop: '90px' }}>
     {this.state.addChapter ? (
-<div>
+<div style={{padding:'12px 0 0 12px'}}>
  
                <TextField
                   name="chapname"
@@ -199,16 +325,19 @@ SendDataLectureFirebase = (chapnumber) => {
                   value={this.state.chapname}
                   style={{width:'200px'}}
                   required
+                  error={this.state.isChapNameError}
                 />
                 <TextField
                   name="chapnumber"
                   label="Chapter Number"
+                  type="number"
                   className={classes.textField}
                   onChange={e => this.change(e)}
                   variant="outlined"
                   value={this.state.chapnumber}
                   style={{width:'200px'}}
                   required
+                  error={this.state.isChapNumberError}
                 />
                 <Button 
                   variant="contained" 
@@ -230,13 +359,12 @@ SendDataLectureFirebase = (chapnumber) => {
               </Button>
             </div>
                  ):(
-            <div>
+            <div style={{padding:'12px 0 0 12px'}}>
               <Button 
                 variant="contained" 
                 color="secondary" 
                 className={classes.button} 
-                onClick={()=>this.newChapter()}
-                style={{marginLeft:'18px'}}>
+                onClick={()=>this.newChapter()}>
 
                 New Chapter
                 <AddIcon className={classes.rightIcon} style={{marginLeft:'10px'}}/>
@@ -248,25 +376,35 @@ SendDataLectureFirebase = (chapnumber) => {
     <Grid container spacing={12}>
 
    <Grid item xs={8}>
+     <h3 style={{textAlign:'center'}}>Your Subject</h3>
      <List
       component="nav"
-      subheader={<ListSubheader component="div">Your Subject</ListSubheader>}
       className={classes.root}
+      style={{marginLeft:'8px'}}
      >
 
       {this.state.chapters.map((chap,index) => {
        return (
         <div key={index}>
+        <Paper>
+          <div style={{display:'flex',marginBottom:'5px'}}>
+            
          <ListItem button onClick={()=>this.handleClick(index)}>
           <ListItemIcon>
            <StarBorder />
           </ListItemIcon>
-          <ListItemText inset primary={"Chapter "+chap.ChapNumber} />
-          
+          <ListItemText inset primary={"Chapter "+chap.ChapNumber+" , "+chap.ChapName} />
           
           {this.state[index] ? <ExpandLess /> : <ExpandMore />}
          </ListItem>
-         <Collapse in={this.state[index]} timeout="auto" unmountOnExit style={{ paddingLeft: '30px' }}>
+         <Fab size="small" onClick={()=>this.DeleteChapter(chap.ChapNumber)}>
+           <DeleteIcon fontSize="small" />
+         </Fab>
+         
+
+         </div>
+         </Paper>
+         <Collapse in={this.state[index]} timeout="auto" unmountOnExit style={{ paddingLeft: '50px' }}>
          
          {this.state.addLecture ? (
 <div>
@@ -280,22 +418,25 @@ SendDataLectureFirebase = (chapnumber) => {
                   value={this.state.lectname}
                   style={{width:'200px'}}
                   required
+                  error={this.state.isLectNameError}
                 />
                 <TextField
                   name="lectnumber"
                   label="Lecture Number"
+                  type="number"
                   className={classes.textField}
                   onChange={e => this.change(e)}
                   variant="outlined"
                   value={this.state.lectnumber}
                   style={{width:'200px'}}
                   required
+                  error={this.state.isLectNumberError}
                 />
                 <Button 
                   variant="contained" 
                   color="secondary" 
                   className={classes.button} 
-                  onClick={()=>this.addLecture(chap.ChapNumber)}>
+                  onClick={()=>this.addLecture(chap.ChapNumber,chap.LectureValue)}>
 
                           Add
   
@@ -317,8 +458,7 @@ SendDataLectureFirebase = (chapnumber) => {
                   variant="contained" 
                   color="primary" 
                   className={classes.button} 
-                  onClick={()=>this.newLecture()}
-                  style={{marginLeft:'18px'}}>
+                  onClick={()=>this.newLecture()}>
 
                   New Lecture
                   <AddIcon className={classes.rightIcon} style={{marginLeft:'10px'}}/>
@@ -327,21 +467,31 @@ SendDataLectureFirebase = (chapnumber) => {
       
                 </div>
           )}
-      {chap.LectureValue===1 ? (
+      {chap.LectureValue>1 ? (
         [Object.values(chap.Lectures).map((lect,index) => {
           return (
            <div key={index}>
             
             
              <List component="div" disablePadding>
-              <ListItem button onClick={()=>this.openLecture(lect.LectureNumber,chap.ChapNumber)} >
+             <Paper style={{marginRight:'30px',marginBottom:'5px'}}>
+               <div style={{display:'flex'}}>
+               
+              <ListItem button onClick={()=>this.openLecture(lect.LectureNumber,chap.ChapNumber,lect.LectureDoc,lect.LectureVideo)} >
                <ListItemIcon>
                 <StarBorder />
                </ListItemIcon>
-               <ListItemText inset primary={"Lecture "+lect.LectureNumber} />
+               <ListItemText inset primary={"Lecture "+lect.LectureNumber+" , "+lect.LectureName} />
+               
               </ListItem>
+              <IconButton onClick={()=>this.DeleteLecture(chap.ChapNumber,lect.LectureNumber,chap.LectureValue)}>
+              <DeleteIcon fontSize="small" />
+              </IconButton>
+              
+         </div>
+         </Paper>
              </List>
-            
+             
            </div>
           );
          })]
@@ -359,8 +509,13 @@ SendDataLectureFirebase = (chapnumber) => {
      </List>
      </Grid>
      <Grid item xs={4}>
-       Hello
+       
+     <ChatBox subid={this.state.subid} actor={this.state.actor}/>
+
      </Grid>
+
+     <LeaveReview subjectID={this.state.subid}/>
+
      </Grid>
     </div>
     <Footer />
@@ -372,5 +527,7 @@ SendDataLectureFirebase = (chapnumber) => {
 subjectHome.propTypes = {
  classes: PropTypes.object.isRequired,
 };
-export default withStyles(profilePageStyle)(subjectHome);
-/**/
+
+const subjectHome1 = withSnackbar(subjectHome);
+
+export default withStyles(profilePageStyle)(subjectHome1);

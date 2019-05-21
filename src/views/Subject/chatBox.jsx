@@ -25,7 +25,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import LinearProgress from '@material-ui/core/LinearProgress';
 //firebase
-import fire from './Firebase/fire';
+import fire from '../Firebase/fire';
 
 import ClickAwayListener from '@material-ui/core/ClickAwayListener';
 import Grow from '@material-ui/core/Grow';
@@ -36,23 +36,37 @@ import MenuList from '@material-ui/core/MenuList';
 import Fab from '@material-ui/core/Fab';
 
 
-class uploading extends React.Component {
+class chatBox extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      completed:null,
-      url:null,
+      subid:null,
+      userID:null,
+      name:null,
+      actor:null,
       messageList: [],
-      open: false,
       textMessage:""
     };
   }
 
   componentDidMount = () => {
+
+   var user = localStorage.getItem("uid");
+    var user1 = JSON.parse(user);
+    var nameInitial = user1.displayName;
+    var userID=user1.uid;
+
+    this.setState({
+     subid: this.props.subid,
+     userID:userID,
+     name:nameInitial,
+     actor:this.props.actor
+    })
+
     let currentComponent = this;
   
     
-    fire.database().ref('chat/Materials').on('value', function(snapshot) {
+    fire.database().ref('subjects/'+this.props.subid+'/Chats').on('value', function(snapshot) {
       var allchap=[];
       snapshot.forEach(function(childSnapshot){
         allchap=allchap.concat(childSnapshot.val());
@@ -64,25 +78,13 @@ class uploading extends React.Component {
   
   }
 
-  _onMessageWasSent(message) {
-    var database=fire.database();
- 
-    var updates = {};
-    this.setState({
-      messageList: [...this.state.messageList, message]
-    },()=>{
-      updates['chat/Materials'] = this.state.messageList;
-      return database.ref().update(updates);
-    })
-    
-  }
   
   sendText = () =>{
-    var text2=this.state.textMessage;
     var message={
-          author: "Moro",
-          type: "text",
-          data: { text:text2 }
+          author: this.state.name,
+          actID: this.state.userID,
+          actor: this.state.actor,
+          data: { text:this.state.textMessage }
     };
     var database=fire.database();
  
@@ -91,36 +93,13 @@ class uploading extends React.Component {
       messageList: [...this.state.messageList, message],
       textMessage:""
     },()=>{
-      updates['chat/Materials'] = this.state.messageList;
+      updates['subjects/'+this.state.subid+'/Chats'] = this.state.messageList;
       return database.ref().update(updates);
     })
     
 
   }
  
-  _sendMessage(text) {
-    if (text.length > 0) {
-      this.setState({
-        messageList: [...this.state.messageList, {
-          author: 'me',
-          type: 'text',
-          data: { text }
-        }]
-      })
-    }
-  }
-  
-  handleToggle = () => {
-    this.setState(state => ({ open: !state.open }));
-  };
-
-  handleClose = event => {
-    if (this.anchorEl.contains(event.target)) {
-      return;
-    }
-
-    this.setState({ open: false });
-  };
 
   onChange = (event) =>{
  this.setState({
@@ -132,58 +111,45 @@ class uploading extends React.Component {
     const { open } = this.state;
 
     return (
-      <div style={{ marginLeft: '20px', marginRight: '20px' }}>
 
-      <Launcher
-        agentProfile={{
-          teamName: 'react-chat-window',
-          imageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png'
-        }}
-        onMessageWasSent={this._onMessageWasSent.bind(this)}
-        messageList={this.state.messageList}
-        showEmoji
-      />
-
-        <div>
-          <Fab
-          size="small"
-            buttonRef={node => {
-              this.anchorEl = node;
-            }}
-            aria-owns={open ? 'menu-list-grow' : undefined}
-            aria-haspopup="true"
-            onClick={this.handleToggle}
-          >
-            <StarBorder fontSize="small"/>
-          </Fab>
-          <Popper open={open} anchorEl={this.anchorEl} transition disablePortal>
-            {({ TransitionProps, placement }) => (
-              <Grow
-                {...TransitionProps}
-                id="menu-list-grow"
-                style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-              >
-                <Paper style={{width:'300px',height:'400px'}}>
+        <div style={{marginLeft:'20px',marginRight:'20px'}}>
+          <h3 style={{textAlign:'center'}}>Discussion Chat</h3>
+                <Paper style={{width:'auto',height:'400px',marginTop:'17px'}}>
                   <div style={{height:'350px',overflow:'auto'}}>
                     {this.state.messageList.map((mess,index)=>{
                       return(
 
-                        <div key={index} style={{marginLeft:'5px'}}>
+                        <div key={index} style={{marginLeft:'5px',marginRight:'5px'}}>
 
                           <div style={{marginBottom:'8px'}}>
-                          {mess.author==="Moro" ? (
+                          {mess.author===this.state.name ? (
                             <div style={{justifyContent:'flex-end',display:'flex'}}>
                             <Paper style={{color:'white',backgroundColor:'#4e8cff',borderRadius:'12px',padding:'8px 8px 8px 8px',display:'flex',alignItems:'center',width:'fit-content',maxWidth:'200px'}}>
                       {mess.data.text}
                         </Paper>
                         </div>
                           ):(
+
+                            <div>
+                           {mess.actor==="teacher" ? (
+                            <div>
+                            <p style={{fontSize:'12px',margin:'0px'}}>Teacher</p>
+                          <Paper style={{color:'white',backgroundColor:'#ff0000',borderRadius:'12px',padding:'8px 8px 8px 8px',display:'flex',alignItems:'center',width:'fit-content',maxWidth:'200px'}}>
+                      {mess.data.text}
+                        </Paper>
+                            </div>
+                           ):(
                             <div>
                             <p style={{fontSize:'12px',margin:'0px'}}>{mess.author}</p>
                           <Paper style={{borderRadius:'12px',padding:'8px 8px 8px 8px',display:'flex',alignItems:'center',width:'fit-content',maxWidth:'200px'}}>
                       {mess.data.text}
                         </Paper>
+                            </div>
+                           )}
+                            
+
                         </div>
+
                           )}
                           
 
@@ -194,23 +160,18 @@ class uploading extends React.Component {
                       )
                     })}
                     </div>
-                    <Paper style={{padding:'2px 4px',display:'flex',alignItems:'center',width:'300px'}} elevation={1}>
+                    <Paper style={{padding:'1px 4px',display:'flex',alignItems:'center',width:'auto'}} elevation={1}>
                     
-                    <InputBase onChange={e=>this.onChange(e)} value={this.state.textMessage} className={classes.input} placeholder="Message..." style={{width:'245px'}}/>
-      <IconButton onClick={()=>this.sendText()} className={classes.iconButton}>
+                    <InputBase onChange={e=>this.onChange(e)} value={this.state.textMessage} className={classes.input} placeholder="Message..." style={{width:'90%'}}/>
+      <IconButton onClick={()=>this.sendText()} className={classes.iconButton} style={{display:'flex',justifyContent:'flex-end'}}>
         <StarBorder />
       </IconButton>
       </Paper>
                   
                 </Paper>
-              </Grow>
-            )}
-          </Popper>
         </div>
-
-      </div>
     );
   }
 }
 
-export default withStyles()(uploading);
+export default withStyles()(chatBox);

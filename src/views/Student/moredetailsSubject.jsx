@@ -86,7 +86,6 @@ var postSubject = {
 //var joinedDate=getDataTimeAll
   database.ref('users/' + userstudent.uid + '/subjects/' + mon ).once("value")
   .then(function(snapshot) {
-   console.log(snapshot.val());
     var b= snapshot.exists();// true
     if(!b){
      if(userstudent!==null){
