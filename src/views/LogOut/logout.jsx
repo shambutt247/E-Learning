@@ -85,26 +85,6 @@ class logout extends React.Component {
       return (
          <List className={classes.list}>
             <ListItem className={classes.listItem}>
-               <Button
-                  href="#pablo"
-                  className={classes.navLink}
-                  onClick={e => e.preventDefault()}
-                  color="transparent"
-               >
-                  Discover
-                    </Button>
-            </ListItem>
-            <ListItem className={classes.listItem}>
-               <Button
-                  href="#pablo"
-                  className={classes.navLink}
-                  onClick={e => e.preventDefault()}
-                  color="transparent"
-               >
-                  Wishlist
-                    </Button>
-            </ListItem>
-            <ListItem className={classes.listItem}>
                <IconButton
                justIcon
                   onClick={e => e.preventDefault()}
@@ -139,8 +119,6 @@ class logout extends React.Component {
                 <Paper>
                   <ClickAwayListener onClickAway={()=>this.handleClose()}>
                     <MenuList>
-                      <MenuItem onClick={()=>this.handleClose()}>Profile</MenuItem>
-                      <MenuItem onClick={()=>this.handleClose()}>My account</MenuItem>
                       <MenuItem onClick={()=>this.loggingOut()}>Logout</MenuItem>
                     </MenuList>
                   </ClickAwayListener>

@@ -117,7 +117,30 @@ class addcourseStudent extends React.Component {
                     </CardContent>
                   </CardActionArea>
                   <CardActions style={{ justifyContent: 'space-around' }}>
-                    {details.review.RT === 5 ? (
+                    {Array.apply(null,Array(parseInt(details.review.RT,10))).map((i)=>
+                          <Star  />
+                          )}
+                          {Array.apply(null,Array(5-parseInt(details.review.RT,10))).map((i)=>
+                          <StarBorder  />
+                          )}
+
+                    <ReviewPanel AllReview={details.review.allreviews}/>
+
+                  </CardActions>
+                </Card>
+              </Grid>
+
+
+            </div>)}
+
+        </Grid>
+      </div>
+    );
+  }
+}
+
+export default withStyles(profilePageStyle)(addcourseStudent);
+/*{details.review.RT === 5 ? (
                       <div>
                         <Star />
                         <Star />
@@ -189,21 +212,4 @@ class addcourseStudent extends React.Component {
                         </div>
                         )}
                         </div>
-                      )}
-
-                    <ReviewPanel AllReview={details.review.allreviews}/>
-
-                  </CardActions>
-                </Card>
-              </Grid>
-
-
-            </div>)}
-
-        </Grid>
-      </div>
-    );
-  }
-}
-
-export default withStyles(profilePageStyle)(addcourseStudent);
+                      )}*/

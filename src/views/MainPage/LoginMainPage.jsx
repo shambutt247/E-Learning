@@ -60,11 +60,23 @@ class LoginMainPage extends React.Component {
     localStorage.setItem("uid", JSON.stringify(authUser.user));
     fire.database().ref('/users/' + authUser.user.uid).once('value').then(function(snapshot) {
       var userType=snapshot.val().userType;
+      var status=snapshot.val().status;
       if (userType === "student") {
-        history.push('/home-student');
+        if(status==="Blocked"){
+          this.FailedLog("Your Account has been Blocked");
+        }else if(status==="Active"){
+          history.push('/home-student');
+        }
       }
       else if (userType === "teacher") {
-        history.push('/home-teacher');
+        if(status==="Blocked"){
+          this.FailedLog("Your Account has been Blocked");
+        }else if(status==="Active"){
+          history.push('/home-teacher');
+        }
+      } 
+      else if (userType === "admin") {
+        history.push('/home-admin');
       }
     }).catch(error=>{
       this.FailedLog(error.message);

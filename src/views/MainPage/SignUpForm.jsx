@@ -97,7 +97,9 @@ class SignUpForm extends React.Component {
           name: name,
           lastName: lastname,
           email: email,
-          userType: actor
+          userType: actor,
+          userID:uniqueID,
+          status:"Active"
         });
       })
       .then(() => {

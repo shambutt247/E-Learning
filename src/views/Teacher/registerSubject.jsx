@@ -76,7 +76,7 @@ class registerSubjects extends React.Component {
         difficutly:difficulty,
         category:category ,
         duration:duration,
-        active:true,
+        status:"Blocked",
         teacherid:userteacher.uid,
         sstrenght:0,
         review:{
@@ -255,10 +255,8 @@ class registerSubjects extends React.Component {
                     }}
                     required
                   >
-                    <MenuItem value={'Science'}>Science</MenuItem>
-                    <MenuItem value={'Language'}>Language</MenuItem>
-                    <MenuItem value={'Math'}>Math</MenuItem>
-                    <MenuItem value={'History'}>History</MenuItem>
+                    <MenuItem value={'Matric'}>Science</MenuItem>
+                    <MenuItem value={'Intermediate'}>Language</MenuItem>
                   </Select>
                   <FormHelperText>Select one</FormHelperText>
                 </FormControl>
