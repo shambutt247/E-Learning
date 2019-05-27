@@ -1,4 +1,5 @@
 import React from "react";
+import history from "../../history";
 // @material-ui/core components
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
@@ -28,10 +29,10 @@ import fire from "../Firebase/fire.js";
 import Lecture from './lecture.jsx';
 import Grid from '@material-ui/core/Grid';
 import { withSnackbar } from 'notistack';
-import VideoIcon from '@material-ui/icons/baseline-video_library-24px.svg'
 import Fab from '@material-ui/core/Fab';
 import ChatBox from './chatBox'
 import LeaveReview from './leaveReview';
+import ReviewPanel from './reviewPanel';
 
 class subjectHome extends React.Component {
  constructor(props) {
@@ -53,11 +54,17 @@ class subjectHome extends React.Component {
    isLectNameError:false,
    isLectNumberError:false,
    subid:this.props.location.state.subid,
-   actor:this.props.location.state.actor
+   actor:this.props.location.state.actor,
+   subname:this.props.location.state.subname,
+   totalR:0,
+   allR:[]
   };
   this.openLecture=this.openLecture.bind(this);
  }
  componentDidMount = () => {
+
+  this.checkUserID();
+
   let currentComponent = this;
 
   
@@ -71,6 +78,36 @@ class subjectHome extends React.Component {
     });
 });
 
+fire.database().ref('subjects/'+ this.state.subid + '/review').on('value', function(snapshot) {
+  var allR=[];
+  var tot=snapshot.val().total;
+  if(tot!==0){
+    snapshot.allreviews.forEach(function(childSnapshot){
+      allR=allR.concat(childSnapshot.val());
+    });
+  }
+  currentComponent.setState({
+    totalR:snapshot.val().total,
+   allR:allR
+  });
+});
+
+}
+
+checkUserID =()=>{
+  
+  if("uid" in localStorage){
+    var user = localStorage.getItem("uid");
+    var userid = JSON.parse(user);
+
+    fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
+      if(snapshot.val().userType!=="teacher"){
+        history.push('/');
+      }
+    });
+  }else {
+    history.push('/');
+  }
 }
 
  handleClick = (index) => {
@@ -302,7 +339,7 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
    <div>
     <Header
      color="white"
-     brand="Welcome"
+     brand="Learning Birds"
      rightLinks={<Signout />}
      fixed
      changeColorOnScroll={{
@@ -313,7 +350,11 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
     />
     
     <div className={classNames(classes.main, classes.mainRaised)} style={{ marginTop: '90px' }}>
-    {this.state.addChapter ? (
+      {this.state.actor==="teacher" ? (
+        
+        <div>
+        <ReviewPanel AllReview={this.state.allR} AnyRev={this.state.totalR}/>
+        {this.state.addChapter ? (
 <div style={{padding:'12px 0 0 12px'}}>
  
                <TextField
@@ -373,10 +414,13 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
  
             </div>
                   )}
+        </div>
+      ):(null)}
+    
     <Grid container spacing={12}>
 
    <Grid item xs={8}>
-     <h3 style={{textAlign:'center'}}>Your Subject</h3>
+     <h3 style={{textAlign:'center'}}>{this.state.subname}</h3>
      <List
       component="nav"
       className={classes.root}
@@ -405,8 +449,9 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
          </div>
          </Paper>
          <Collapse in={this.state[index]} timeout="auto" unmountOnExit style={{ paddingLeft: '50px' }}>
-         
-         {this.state.addLecture ? (
+         {this.state.actor==="teacher" ? (
+           <div>
+           {this.state.addLecture ? (
 <div>
  
                <TextField
@@ -467,6 +512,9 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
       
                 </div>
           )}
+           </div>
+         ):(null)}
+         
       {chap.LectureValue>1 ? (
         [Object.values(chap.Lectures).map((lect,index) => {
           return (
@@ -513,12 +561,14 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
      <ChatBox subid={this.state.subid} actor={this.state.actor}/>
 
      </Grid>
-
-     <LeaveReview subjectID={this.state.subid}/>
+{this.state.actor==="student" ? (
+  
+  <LeaveReview subjectID={this.state.subid}/>
+):(null)}
+     
 
      </Grid>
     </div>
-    <Footer />
     <Lecture onRef={ref => (this.childLecture = ref)}/>
    </div>
   );

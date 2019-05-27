@@ -17,7 +17,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import Grid from '@material-ui/core/Grid';
 import LinearProgress from '@material-ui/core/LinearProgress';
-
+import CircularProgress from '@material-ui/core/CircularProgress';
 import fire from '../Firebase/fire';
 
 const styles = {
@@ -227,7 +227,7 @@ class lecture extends React.Component {
             <Toolbar>
               
               <Typography variant="h6" color="inherit" className={classes.flex}>
-                Chapter {this.state.chapter} , Lecture {this.state.dataLecture} , subid : {this.state.subid}, Actor : {this.state.actor}
+                Chapter {this.state.chapter} , Lecture {this.state.dataLecture} 
               </Typography>
               <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                 <CloseIcon />
@@ -237,39 +237,44 @@ class lecture extends React.Component {
           <Grid container spacing={12} style={{marginLeft:'12px',marginRight:'12px',marginTop:'12px'}} >
 
    <Grid item xs={6}>
-     <div style={{textAlign:'center'}}>
+     {this.state.actor==="teacher" ? (
        
-   <input
-        accept="video/*"
-        style={{display:'none'}}
-        id="button-file-video"
-        type="file"
-        onChange={(e)=>this.uploadVideo(e)}
-      />
-      <label htmlFor="button-file-video">
-      <Button component="span" className={classes.button}>
-        Upload Video
-      </Button>
-      </label>
-<LinearProgress variant="determinate" value={this.state.uploadingVid} style={{height:'10px',marginRight:'12px',marginBottom:'10px'}}/>
-{this.state.uploadingVid<100 ? (
-  <div>
-{this.state.uploadingVid>=1 ? (
-  <div>
-<p>Uploading...{this.state.uploadingVid}%</p>
-</div>
-):(
-  <div>
-
-</div>
-)}
-</div>
-):(
-  <div>
-<p>Uploaded !</p>
-</div>
-)}
-</div>
+       <div style={{textAlign:'center'}}>
+       
+       <input
+            accept="video/*"
+            style={{display:'none'}}
+            id="button-file-video"
+            type="file"
+            onChange={(e)=>this.uploadVideo(e)}
+          />
+          <label htmlFor="button-file-video">
+          <Button component="span" className={classes.button}>
+            Upload Video
+          </Button>
+          </label>
+    <LinearProgress variant="determinate" value={this.state.uploadingVid} style={{height:'10px',marginRight:'12px',marginBottom:'10px'}}/>
+    {this.state.uploadingVid<100 ? (
+      <div>
+    {this.state.uploadingVid>=1 ? (
+      <div>
+    <p>Uploading...{this.state.uploadingVid}%</p>
+    </div>
+    ):(
+      <div>
+    
+    </div>
+    )}
+    </div>
+    ):(
+      <div>
+    <p>Uploaded !</p>
+    </div>
+    )}
+    </div>
+       
+     ):(null)}
+     
 {this.state.videoURL!=null ? (
 
 
@@ -284,7 +289,7 @@ class lecture extends React.Component {
 <div>
   {this.state.isVideo ? (
 <div style={{textAlign:'center'}}>
-<p>Please wait while video is Loading...</p>
+<CircularProgress className={classes.progress} />
 </div>
   ):(
     <div style={{textAlign:'center'}}>
@@ -298,8 +303,9 @@ class lecture extends React.Component {
 
    </Grid>
    <Grid item xs={6}>
+{this.state.actor==="teacher" ? (
 
-   <div style={{textAlign:'center'}}>
+  <div style={{textAlign:'center'}}>
    <input
         accept=".pdf"
         style={{display:'none'}}
@@ -332,6 +338,9 @@ class lecture extends React.Component {
 </div>
 )}
 </div>
+  
+):(null)}
+   
   {this.state.pdfURL!=null ? (
             <div>
             <div style={{overflow:'scroll',height:525}}>
@@ -353,7 +362,7 @@ class lecture extends React.Component {
 <div>
 {this.state.isDoc ? (
 <div style={{textAlign:'center'}}>
-<p>Please wait while Document is Loading...</p>
+<CircularProgress className={classes.progress} />
 </div>
   ):(
     <div style={{textAlign:'center'}}>

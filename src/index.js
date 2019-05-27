@@ -13,9 +13,9 @@ import LoginMainPage from "views/MainPage/LoginMainPage.jsx";
 import LoginPage from "views/LoginPage/LoginPage.jsx";
 import landingStudent from "views/Student/landingStudent.jsx";
 import landingTeacher from "views/Teacher/landingTeacher.jsx";
-import UploadingCon from "views/uploading.jsx";
 import AdminDashboard from "views/Admin/AdminDashboard.jsx";
 import SubjectHome from "views/Subject/subjectHome.jsx";
+import Uploading from "views/uploading.jsx";
 import { SnackbarProvider } from 'notistack';
 
 
@@ -34,9 +34,8 @@ ReactDOM.render(
       <Route path="/login-page" component={LoginPage} />
       <Route path="/components" component={Components} />
       <Route path="/subject-home" component={SubjectHome} />
-      <Route path="/" component={LoginMainPage} />
       <Route path="/home-admin" component={AdminDashboard} />
-      <Route path="/joker" component={UploadingCon} />
+      <Route path="/" component={LoginMainPage} />
       
     </Switch>
   </Router>,

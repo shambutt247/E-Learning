@@ -16,8 +16,6 @@ import Check from '@material-ui/icons/Check';
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-import SearchIcon from '@material-ui/icons/Search';
-import InputAdornment from '@material-ui/core/InputAdornment';
 import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -93,7 +91,7 @@ class AdminStudents extends React.Component {
     
     if(this.state.search!=="" && this.state.search!==this.state.search2){
       var st=this.state.search;
-    let ac2=this.state.accounts.filter(x => x[this.state.searchBy].includes(this.state.search));
+    let ac2=this.state.accounts.filter(x => x[this.state.searchBy].toLowerCase().includes(this.state.search));
     this.setState({
       acc2:ac2,
       search2:st

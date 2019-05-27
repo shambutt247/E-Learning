@@ -140,6 +140,7 @@ class registerSubjects extends React.Component {
         
         
         this.SendDataFirebase();
+        this.handleSnack("Subject Registered!!","success");
     this.handleClose();
       }
     });
@@ -157,10 +158,11 @@ class registerSubjects extends React.Component {
     });
   }
   handleClose = () => {
-    this.handleSnack("Subject Registered!!","success");
+    
     this.setState({
       
       subname: null,
+      description:null,
       difficulty:null,
       category: null,
       duration: null,
@@ -255,8 +257,8 @@ class registerSubjects extends React.Component {
                     }}
                     required
                   >
-                    <MenuItem value={'Matric'}>Science</MenuItem>
-                    <MenuItem value={'Intermediate'}>Language</MenuItem>
+                    <MenuItem value={'Matric'}>Matric</MenuItem>
+                    <MenuItem value={'Intermediate'}>Intermediate</MenuItem>
                   </Select>
                   <FormHelperText>Select one</FormHelperText>
                 </FormControl>

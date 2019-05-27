@@ -22,6 +22,8 @@ import Button from '@material-ui/core/Button';
 import pict from '../../assets/img/bg.jpg';
 //firebase
 import fire from "../Firebase/fire.js";
+import history from "../../history";
+
 
 class mycoursesTeacher extends React.Component {
   constructor(props) {
@@ -50,6 +52,16 @@ class mycoursesTeacher extends React.Component {
 });
 
   }
+
+  openSubject = (subjectID,subName) =>{
+    history.push({
+      pathname: '/subject-home',
+      search: '?query=abc',
+      state: {  subid: subjectID,
+                actor:"teacher",
+                subname:subName }
+    });
+  }
   
 
   
@@ -60,14 +72,14 @@ class mycoursesTeacher extends React.Component {
       <div style={{ marginLeft:'20px', marginRight:'20px',overflow: '-webkit-paged-x'}}>
         <RegisterSubject />
        <h3 style={{marginBottom:'20px'}}>
-       Your Subjects
+       My Subjects
        </h3>
        <Grid container spacing={10} justify="space-evenly">
         {this.state.teachersubjects.map((details) =>
   <div key={details.subid}>
     <Grid item xs={5}>
   <Card style={{width:'350px',marginBottom:'30px'}} elevation={2}>
-      <CardActionArea>
+      <CardActionArea onClick={()=>this.openSubject(details.subid, details.subname)}>
         <CardMedia
           objectFit="cover"
           image={require ("assets/img/bg.jpg")}

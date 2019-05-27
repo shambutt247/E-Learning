@@ -14,19 +14,11 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import AddIcon from "@material-ui/icons/Add";
 import { withSnackbar } from 'notistack';
 //Other components
-import TextField from "@material-ui/core/TextField";
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import MenuItem from '@material-ui/core/MenuItem';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
+import Grid from '@material-ui/core/Grid';
 
 //Firebase
 import fire from "../Firebase/fire.js";
 
-
-import Grid from "@material-ui/core/Grid";
 
 function Transition(props) {
   return <Slide direction="up" {...props} />;
@@ -45,7 +37,8 @@ class moredetailsSubject extends React.Component {
     this.state = {
       open: false,
       isError: false,
-      subo:null
+      subo:null,
+      teacherName:""
       /*
       subname: null,
       description:null,
@@ -116,10 +109,23 @@ var postSubject = {
   }
   };
   handleClickOpen = (details) => {
+
+  let currentComponent = this;
+
+    fire.database().ref('users/' + details.teacherid ).on('value', function (snapshot) {
+      var name = snapshot.val().name + " "+snapshot.val().lastName;
+      console.log(snapshot.val());
+      currentComponent.setState({
+        teacherName:name
+      });
+    });
+
     this.setState({
      subo:details,
      open:true},()=>{
-     console.log(this.state.subo);
+     
+      
+
     });
   };
 
@@ -142,10 +148,32 @@ var postSubject = {
           onClose={this.handleClose}
           TransitionComponent={Transition}
         >
-          <DialogTitle>Enter Details of Subject</DialogTitle>
+          <DialogTitle>Details of Subject</DialogTitle>
           <DialogContent>
             {this.state.subo ? (
-             <div>{this.state.subo.subname} {this.state.subo.description}</div>
+               <Grid container style={{textAlign:'center'}}>
+                 <Grid item xs={4} style={{marginBottom:'20px'}}>
+                  <h4 style={{display:'inline'}}>Subject Name</h4> : <h3 style={{display:'inline'}}>{this.state.subo.subname}</h3> 
+                 </Grid>
+                 <Grid item xs={4}>
+                   <h4 style={{display:'inline'}}>Subject Type</h4> : <h3 style={{display:'inline'}}>{this.state.subo.category}</h3>
+                 </Grid>
+                 <Grid item xs={4}>
+                 <h4 style={{display:'inline'}}>Subject Duration</h4> : <h3 style={{display:'inline'}}>{this.state.subo.duration} Weeks</h3>
+                 </Grid>
+                 <Grid item xs={4} style={{marginBottom:'20px'}}>
+                 <h4 style={{display:'inline'}}>Subject Difficulty</h4> : <h3 style={{display:'inline'}}>{this.state.subo.difficutly}</h3>
+                 </Grid>
+                 <Grid item xs={4}>
+                 <h4 style={{display:'inline'}}>Student Strenght</h4> : <h3 style={{display:'inline'}}>{this.state.subo.sstrenght}</h3>
+                 </Grid>
+                 <Grid item xs={4}>
+                 <h4 style={{display:'inline'}}>Taught By</h4> : <h3 style={{display:'inline'}}>{this.state.teacherName}</h3>
+                 </Grid>
+                 <Grid item xs={12}>
+                 <h4 style={{display:'inline'}}>Subject Description</h4> : <h3 style={{display:'inline'}}>{this.state.subo.description}</h3>
+                 </Grid>
+               </Grid>
             ):(
              <div></div>
             )}

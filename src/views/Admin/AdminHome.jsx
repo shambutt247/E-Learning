@@ -5,22 +5,16 @@ import { withStyles } from '@material-ui/core/styles';
 // react plugin for creating charts
 import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
-import Store from "@material-ui/icons/Store";
-import Warning from "@material-ui/icons/Warning";
-import DateRange from "@material-ui/icons/DateRange";
-import LocalOffer from "@material-ui/icons/LocalOffer";
-import Update from "@material-ui/icons/Update";
 import ArrowUpward from "@material-ui/icons/ArrowUpward";
 import ArrownDownward from "@material-ui/icons/ArrowDownward";
+import Star from '@material-ui/icons/Star';
 // core components
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Card from "components/Card/Card.jsx";
 import CardHeader from "components/Card/CardHeader.jsx";
 import CardBody from "components/Card/CardBody.jsx";
-import CircularProgress from '@material-ui/core/CircularProgress';
 //Admin Components
-import {Pie} from 'react-chartjs-2';
 import {Doughnut} from 'react-chartjs-2';
 import {Bar} from 'react-chartjs-2';
 import School from '@material-ui/icons/School';
@@ -279,12 +273,12 @@ class AdminHome extends React.Component {
                   <h4 className={classes.cardTitle}>Total : {this.state.totalSubject}</h4>
                 <p className={classes.cardCategory} >
                   <span className={classes.successText} style={{verticalAlign:'top'}}>
-                    <ArrowUpward fontSize="small" style={{color:'#00ff00'}}/> Matric Level : {this.state.matric}
+                    <Star fontSize="small" /> Matric Level : {this.state.matric}
                   </span>
                 </p>
                 <p className={classes.cardCategory}>
                   <span className={classes.successText} style={{verticalAlign:'top'}}>
-                    <ArrownDownward fontSize="small" style={{color:'#ff0000'}}/> Intermediate Level : {this.state.intermediate}
+                    <Star fontSize="small" /> Intermediate Level : {this.state.intermediate}
                   </span>
                 </p>
                   </Grid>

@@ -142,16 +142,7 @@ class profileStudent extends React.Component {
                 </div>
                 <div>
                   <h3>{this.state.Name}</h3>
-                  <h6>DESIGNER</h6>
-                  <Button justIcon link className={classes.margin5}>
-                    <i className={"fab fa-twitter"} />
-                  </Button>
-                  <Button justIcon link className={classes.margin5}>
-                    <i className={"fab fa-instagram"} />
-                  </Button>
-                  <Button justIcon link className={classes.margin5}>
-                    <i className={"fab fa-facebook"} />
-                  </Button>
+                  <h6>STUDENT</h6>
                 </div>
               </div>
             </GridItem>

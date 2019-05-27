@@ -110,7 +110,7 @@ class LoginMainPage extends React.Component {
       <div>
         <Header
           color="transparent"
-          brand="E-Learning Portal !"
+          brand="Learning Birds !"
           rightLinks={<SignUpForm />}
           fixed
           changeColorOnScroll={{

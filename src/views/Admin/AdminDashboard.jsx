@@ -109,6 +109,24 @@ class AdminDashboard extends React.Component {
     open2:false
   };
 
+  componentDidMount = () => {
+
+    if("uid" in localStorage){
+      var user = localStorage.getItem("uid");
+      var userid = JSON.parse(user);
+  
+      fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
+        if(snapshot.val().userType!=="admin"){
+          history.push('/');
+        }
+      });
+    }else {
+      history.push('/');
+    }
+    
+
+  }
+
   handleDrawerOpen = () => {
     this.setState({ open: true });
   };
@@ -165,7 +183,7 @@ class AdminDashboard extends React.Component {
               <MenuIcon />
             </IconButton>
             <Typography variant="h6" color="inherit" noWrap>
-              Admin Panel
+              Learning Birds (Admin Panel)
             </Typography>
               <div style={{flex:'1',justifyContent:'flex-end'}}/>
             <IconButton

@@ -8,9 +8,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
 import profilePageStyle from "assets/jss/material-kit-react/views/profilePage.jsx";
 import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
-import ButtonBase from '@material-ui/core/ButtonBase';
 import People from '@material-ui/icons/People';
 import Card from '@material-ui/core/Card';
 import CardActionArea from '@material-ui/core/CardActionArea';
@@ -20,6 +18,7 @@ import CardMedia from '@material-ui/core/CardMedia';
 import Button from '@material-ui/core/Button';
 import pict from '../../assets/img/bg.jpg';
 import ReviewPanel from '../Subject/reviewPanel.jsx'
+import TextField from '@material-ui/core/TextField';
 //firebase
 import fire from "../Firebase/fire.js";
 import MoreDetailsSubject from "./moredetailsSubject.jsx";
@@ -31,9 +30,13 @@ class addcourseStudent extends React.Component {
     super(props);
     this.state = {
       allsubjects: [],
+      allsubs:[],
       opens: false,
       singlesub: null,
-      ratings: 0
+      ratings: 0,
+      selection:"none",
+      search: "",
+      search2:""
     };
 
   }
@@ -45,10 +48,13 @@ class addcourseStudent extends React.Component {
     fire.database().ref('subjects/').on('value', function (snapshot) {
       var allsub = [];
       snapshot.forEach(function (childSnapshot) {
-        allsub = allsub.concat(childSnapshot.val());
-      });
+        if(childSnapshot.val().status!=="Blocked"){
+          allsub = allsub.concat(childSnapshot.val());
+        }
+            });
       currentComponent.setState({
-        allsubjects: allsub
+        allsubjects: allsub,
+        allsubs:allsub
       });
     });
 
@@ -69,8 +75,50 @@ class addcourseStudent extends React.Component {
     })
   }
 
+  handleMatric = () =>{
+this.setState({
+selection:"Matric"
+});
+  }
+
+  handleInter = () =>{
+    this.setState({
+    selection:"Intermediate"
+    });
+  }
+
+  handleAll = () =>{
+    this.setState({
+    selection:"All"
+    });
+  }
+
+  change = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    });
+  };
+
+  handleSearch = () =>{
+    
+    if(this.state.search!=="" && this.state.search!==this.state.search2){
+      var st=this.state.search;
+    let ac2=this.state.allsubjects.filter(x => x.subname.toLowerCase().includes(this.state.search));
+    this.setState({
+      allsubs:ac2,
+      search2:st
+    });
+  } else if(this.state.search==="" && this.state.search2!==""){
+    this.setState({
+      allsubs:this.state.allsubjects,
+      search2:""
+    });
+  }
+  }
+
   render() {
     const { classes, ...rest } = this.props;
+    this.handleSearch();
     return (
       <div style={{ marginLeft: '20px', marginRight: '20px' }}>
 
@@ -81,10 +129,42 @@ class addcourseStudent extends React.Component {
         <h3 style={{ marginBottom: '20px' }}>
           Search Subject
        </h3>
-        <Grid container spacing={10} justify="space-evenly">
-          {this.state.allsubjects.map((details) =>
-            <div key={details.subid}>
-              <Grid item xs={5}>
+       <div style={{textAlign:'center',borderBottom:'inset',paddingBottom:'18px'}}>
+       <Button onClick={()=>this.handleMatric()} color="primary" autoFocus>
+              Matric
+            </Button>
+            <Button onClick={()=>this.handleInter()} color="primary" autoFocus>
+              Intermediate
+            </Button>
+            <Button onClick={()=>this.handleAll()} color="primary" autoFocus>
+              All
+            </Button>
+            <TextField
+              name="search"
+              placeholder="Subject Name...."
+              className={classes.textField}
+              hintText="Search"
+              onChange={e => this.change(e)}
+              value={this.state.search}
+            />
+       </div>
+       
+
+            {this.state.selection==="none" ? (
+            <div style={{textAlign:'center',marginTop:'25px'}}>
+              Please Select an Option Above !
+            </div>
+          ):(
+        <Grid container spacing={4} justify="center" style={{marginTop:'50px'}}>
+            
+            {this.state.allsubs.map((details) =>
+
+              <Grid item xs={4}>
+
+              <div style={{textAlign:'-webkit-center'}}>
+                {(this.state.selection===details.category || this.state.selection==="All") ? (
+                  <div key={details.subid}>
+              
                 <Card style={{ width: '350px', marginBottom: '30px' }} elevation={2}>
                   <CardActionArea onClick={() => this.handleDetailsSubject(details)}>
                     <CardMedia
@@ -93,7 +173,7 @@ class addcourseStudent extends React.Component {
                       title={details.subname}
                       style={{ height: '150px' }}
                     />
-                    <CardContent>
+                    <CardContent style={{padding:'9px'}}>
                       <Grid
                         container
                         spacing={12}
@@ -116,7 +196,7 @@ class addcourseStudent extends React.Component {
                       </Grid>
                     </CardContent>
                   </CardActionArea>
-                  <CardActions style={{ justifyContent: 'space-around' }}>
+                  <CardActions style={{ justifyContent: 'center' }}>
                     {Array.apply(null,Array(parseInt(details.review.RT,10))).map((i)=>
                           <Star  />
                           )}
@@ -124,92 +204,25 @@ class addcourseStudent extends React.Component {
                           <StarBorder  />
                           )}
 
-                    <ReviewPanel AllReview={details.review.allreviews}/>
+                    <ReviewPanel AllReview={details.review.allreviews} AnyRev={details.review.total}/>
 
                   </CardActions>
                 </Card>
+              
+              </div>
+                ):(null)}
+              </div>
               </Grid>
 
 
-            </div>)}
 
+            )}
+            
         </Grid>
+        )}
       </div>
     );
   }
 }
 
 export default withStyles(profilePageStyle)(addcourseStudent);
-/*{details.review.RT === 5 ? (
-                      <div>
-                        <Star />
-                        <Star />
-                        <Star />
-                        <Star />
-                        <Star />
-                      </div>
-                    ) : (
-                        <div>
-                          {details.review.RT === 4 ? (
-                            <div>
-                              <Star />
-                              <Star />
-                              <Star />
-                              <Star />
-                              <StarBorder />
-                            </div>
-                          ) : (
-                            <div>
-                          {details.review.RT === 3 ? (
-                            <div>
-                              <Star />
-                              <Star />
-                              <Star />
-                              <StarBorder />
-                              <StarBorder />
-                            </div>
-                          ) : (
-                            <div>
-                          {details.review.RT === 2 ? (
-                            <div>
-                              <Star />
-                              <Star />
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                            </div>
-                          ) : (
-                            <div>
-                          {details.review.RT === 1 ? (
-                            <div>
-                              <Star />
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                            </div>
-                          ) : (
-                            <div>
-                          {details.review.RT === 0 ? (
-                            <div>
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                              <StarBorder />
-                            </div>
-                          ) : (
-                            <div>
-                            <Typography variant="subtitle2">No Reviews Given</Typography>
-                            </div>
-                        )}
-                        </div>
-                        )}
-                        </div>
-                        )}
-                        </div>
-                        )}
-                        </div>
-                        )}
-                        </div>
-                      )}*/

@@ -1,13 +1,14 @@
 import React from "react";
+import history from "../../history";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
-import Camera from "@material-ui/icons/Camera";
-import Palette from "@material-ui/icons/Palette";
-import HomeIcon from "@material-ui/icons/";
 import Favorite from "@material-ui/icons/Favorite";
+import Person from '@material-ui/icons/Person';
+import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
+import Home from '@material-ui/icons/Home';
 // core components
 import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
@@ -20,16 +21,29 @@ import Parallax from "components/Parallax/Parallax.jsx";
 import profilePageStyle from "assets/jss/material-kit-react/views/profilePage.jsx";
 
 import Signout from "../LogOut/logout.jsx";
-import HomeTeacher from "./homeTeacher.jsx";
 import ProfileTeacher from "./profileTeacher.jsx";
 import MyCoursesTeacher from "./mycoursesTeacher.jsx";
+
+import fire from '../Firebase/fire';
 
 class landingTeacher extends React.Component {
   constructor(props) {
     super(props);
   }
   componentDidMount = () => {
-    
+
+    if("uid" in localStorage){
+      var user = localStorage.getItem("uid");
+      var userid = JSON.parse(user);
+  
+      fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
+        if(snapshot.val().userType!=="teacher"){
+          history.push('/');
+        }
+      });
+    }else {
+      history.push('/');
+    }
   }
   
   render() {
@@ -38,7 +52,7 @@ class landingTeacher extends React.Component {
       <div>
         <Header
           color="white"
-          brand="Welcome"
+          brand="Learning Birds"
           rightLinks={<Signout />}
           fixed
           changeColorOnScroll={{
@@ -56,34 +70,22 @@ class landingTeacher extends React.Component {
                     color="primary"
                     tabs={[
                       {
-                        tabButton: "Home",
-                        tabIcon: Camera,
-                        tabContent: (
-                         <HomeTeacher />
-                        )
-                      },
-                      {
                         tabButton: "Profile",
-                        tabIcon: Palette,
+                        tabIcon: Person,
                         tabContent: (
                           <ProfileTeacher />
                         )
                       },
                       {
                         tabButton: "My Courses",
-                        tabIcon: Favorite,
+                        tabIcon: ChromeReaderMode,
                         tabContent: (
                           <MyCoursesTeacher />
                         )
                       }
                     ]}
                   />
-                
-              
-            
-          
         </div>
-        <Footer />
       </div>
     );
   }

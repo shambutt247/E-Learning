@@ -140,10 +140,22 @@ class chatBox extends React.Component {
                             </div>
                            ):(
                             <div>
-                            <p style={{fontSize:'12px',margin:'0px'}}>{mess.author}</p>
+                              {mess.actor==="admin" ? (
+                                <div>
+                                <p style={{fontSize:'12px',margin:'0px'}}>ADMIN</p>
+                          <Paper style={{color:'white',backgroundColor:'#ff0000',borderRadius:'12px',padding:'8px 8px 8px 8px',display:'flex',alignItems:'center',width:'fit-content',maxWidth:'200px'}}>
+                      {mess.data.text}
+                        </Paper>
+                                </div>
+                              ):(
+                                <div>
+                                <p style={{fontSize:'12px',margin:'0px'}}>{mess.author}</p>
                           <Paper style={{borderRadius:'12px',padding:'8px 8px 8px 8px',display:'flex',alignItems:'center',width:'fit-content',maxWidth:'200px'}}>
                       {mess.data.text}
                         </Paper>
+                                </div>
+                              )}
+                            
                             </div>
                            )}
                             

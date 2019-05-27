@@ -1,12 +1,14 @@
 import React from "react";
+import history from "../../history";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
-import Camera from "@material-ui/icons/Camera";
-import Palette from "@material-ui/icons/Palette";
-import HomeIcon from "@material-ui/icons/";
+
+import Person from '@material-ui/icons/Person';
+import ChromeReaderMode from '@material-ui/icons/ChromeReaderMode';
+import Home from '@material-ui/icons/Home';
 import Favorite from "@material-ui/icons/Favorite";
 // core components
 import Header from "components/Header/Header.jsx";
@@ -20,17 +22,30 @@ import Parallax from "components/Parallax/Parallax.jsx";
 import profilePageStyle from "assets/jss/material-kit-react/views/profilePage.jsx";
 
 import Signout from "../LogOut/logout.jsx";
-import HomeStudent from "./homeStudent.jsx";
 import ProfileStudent from "./profileStudent.jsx";
 import MyCoursesStudent from "./mycoursesStudent.jsx";
 import AddCourseStudent from "./addcourseStudent.jsx";
+
+import fire from '../Firebase/fire';
 
 class landingStudent extends React.Component {
   constructor(props) {
     super(props);
   }
   componentDidMount = () => {
-    
+
+    if("uid" in localStorage){
+      var user = localStorage.getItem("uid");
+      var userid = JSON.parse(user);
+  
+      fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
+        if(snapshot.val().userType!=="student"){
+          history.push('/');
+        }
+      });
+    }else {
+      history.push('/');
+    }
   }
   
   render() {
@@ -39,7 +54,7 @@ class landingStudent extends React.Component {
       <div>
         <Header
           color="white"
-          brand="Welcome"
+          brand="Learning Birds"
           rightLinks={<Signout />}
           fixed
           changeColorOnScroll={{
@@ -57,15 +72,8 @@ class landingStudent extends React.Component {
                     color="primary"
                     tabs={[
                       {
-                        tabButton: "Home",
-                        tabIcon: Camera,
-                        tabContent: (
-                         <HomeStudent />
-                        )
-                      },
-                      {
                         tabButton: "Profile",
-                        tabIcon: Palette,
+                        tabIcon: Person,
                         tabContent: (
                           <ProfileStudent />
                         )
@@ -79,19 +87,15 @@ class landingStudent extends React.Component {
                       },
                       {
                         tabButton: "Add Subjects",
-                        tabIcon: Palette,
+                        tabIcon: ChromeReaderMode,
                         tabContent: (
                           <AddCourseStudent />
                         )
                       }
                     ]}
                   />
-                
-              
-            
-          
+
         </div>
-        <Footer />
       </div>
     );
   }

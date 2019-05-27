@@ -82,12 +82,13 @@ class mycoursesStudent extends React.Component {
     this.props.enqueueSnackbar(mess, {variant});
   }
 
-  openSubject = (subjectID) =>{
+  openSubject = (subjectID,subName) =>{
     history.push({
       pathname: '/subject-home',
       search: '?query=abc',
       state: {  subid: subjectID,
-                actor:"student" }
+                actor:"student",
+                subname:subName }
     });
   }
 
@@ -103,7 +104,7 @@ class mycoursesStudent extends React.Component {
             <div key={details.subid}>
               <Grid item xs={5}>
                 <Card style={{ width: '350px', marginBottom: '30px' }} elevation={2}>
-                  <CardActionArea onClick={()=>this.openSubject(details.subid)}>
+                  <CardActionArea onClick={()=>this.openSubject(details.subid, details.subname)}>
                     <CardMedia
                       objectFit="cover"
                       image={require("assets/img/bg.jpg")}

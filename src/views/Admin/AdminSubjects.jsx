@@ -1,4 +1,5 @@
 import React from 'react';
+import history from "../../history";
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { withStyles } from '@material-ui/core/styles';
@@ -94,7 +95,7 @@ class AdminSubjects extends React.Component {
 
     if (this.state.search !== "" && this.state.search !== this.state.search2) {
       var st = this.state.search;
-      let ac2 = this.state.accounts.filter(x => x[this.state.searchBy].includes(this.state.search));
+      let ac2 = this.state.accounts.filter(x => x[this.state.searchBy].toLowerCase().includes(this.state.search));
       this.setState({
         acc2: ac2,
         search2: st
@@ -107,8 +108,14 @@ class AdminSubjects extends React.Component {
     }
   }
 
-  handleOpenSubject = () => {
-
+  handleOpenSubject = (subId,subName) => {
+    history.push({
+      pathname: '/subject-home',
+      search: '?query=abc',
+      state: {  subid: subId,
+                actor:"admin",
+                subname:subName }
+    });
   }
 
   render() {
@@ -203,7 +210,7 @@ class AdminSubjects extends React.Component {
                               </IconButton>
                             </Grid>
                             <Grid item>
-                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleOpenSubject()}>
+                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleOpenSubject(prop.subid,prop.subname)}>
                                 <ChromeReaderMode fontSize="small" />
 
                               </IconButton>

@@ -93,7 +93,7 @@ class AdminTeachers extends React.Component {
     
     if(this.state.search!=="" && this.state.search!==this.state.search2){
       var st=this.state.search;
-    let ac2=this.state.accounts.filter(x => x[this.state.searchBy].includes(this.state.search));
+    let ac2=this.state.accounts.filter(x => x[this.state.searchBy].toLowerCase().includes(this.state.search));
     this.setState({
       acc2:ac2,
       search2:st

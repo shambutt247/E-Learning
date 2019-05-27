@@ -20,6 +20,7 @@ import Popper from '@material-ui/core/Popper';
 import MenuItem from '@material-ui/core/MenuItem';
 import MenuList from '@material-ui/core/MenuList';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Home from '@material-ui/icons/Home';
 
 import fire from "../Firebase/fire.js";
 
@@ -31,11 +32,12 @@ class logout extends React.Component {
          profileName: null,
          open:false,
          profImage:null,
-         imagep:false
+         imagep:false,
+         actor:null
       };
    }
    componentDidMount = () => {
-
+      let old=this;
       var userstring = localStorage.getItem("uid");
       var user = JSON.parse(userstring);
       var Phto=user.photoURL;
@@ -56,6 +58,13 @@ class logout extends React.Component {
             imagep:true
          });
       }
+
+      fire.database().ref('users/' + user.uid).on('value', function (snapshot) {
+         var userT=snapshot.val().userType;
+         old.setState({
+            actor:userT
+         });
+       });
       
       
    }
@@ -78,6 +87,17 @@ class logout extends React.Component {
       });
    };
 
+   goHome = (event) =>{
+      if(this.state.actor==="admin"){
+         history.push('/home-admin');
+      }else if(this.state.actor==="teacher"){
+         history.push('/home-teacher');
+      }else if(this.state.actor==="student"){
+         history.push('/home-student');
+      }
+      
+   }
+
 
    render() {
       const { classes } = this.props;
@@ -87,11 +107,11 @@ class logout extends React.Component {
             <ListItem className={classes.listItem}>
                <IconButton
                justIcon
-                  onClick={e => e.preventDefault()}
+                  onClick={e => this.goHome(e)}
                   color="white"
 
                >
-                  <Email className={classes.icons} />
+                  <Home className={classes.icons} />
                </IconButton>
             </ListItem>
             <ListItem className={classes.listItem}>
