@@ -32,7 +32,6 @@ import { withSnackbar } from 'notistack';
 import Fab from '@material-ui/core/Fab';
 import ChatBox from './chatBox'
 import LeaveReview from './leaveReview';
-import ReviewPanel from './reviewPanel';
 
 class subjectHome extends React.Component {
  constructor(props) {
@@ -56,8 +55,7 @@ class subjectHome extends React.Component {
    subid:this.props.location.state.subid,
    actor:this.props.location.state.actor,
    subname:this.props.location.state.subname,
-   totalR:0,
-   allR:[]
+   oldIndex:null
   };
   this.openLecture=this.openLecture.bind(this);
  }
@@ -78,19 +76,6 @@ class subjectHome extends React.Component {
     });
 });
 
-fire.database().ref('subjects/'+ this.state.subid + '/review').on('value', function(snapshot) {
-  var allR=[];
-  var tot=snapshot.val().total;
-  if(tot!==0){
-    snapshot.allreviews.forEach(function(childSnapshot){
-      allR=allR.concat(childSnapshot.val());
-    });
-  }
-  currentComponent.setState({
-    totalR:snapshot.val().total,
-   allR:allR
-  });
-});
 
 }
 
@@ -113,11 +98,37 @@ checkUserID =()=>{
 }
 
  handleClick = (index) => {
-   if(this.state[index]===true){
-    this.setState(state => ({ [index]: false }));
-   }else {
-    this.setState(state => ({ [index]: true }));
+   
+  this.closeaddLecture();
+   let oldie=this.state.oldIndex;
+   if(this.state.oldIndex!==index){
+
+    if(this.state[index]===true){
+      this.setState(state => ({ 
+        [index]: false,
+        oldIndex:index
+       }));
+     }else {
+      this.setState(state => ({ 
+        [index]: true,
+        oldIndex:index,
+        [oldie]:false 
+      }));
+     }
+
+   }else if(this.state.oldIndex===index){
+    if(this.state[index]===true){
+      
+      this.setState(state => ({ 
+        [index]: false
+       }));
+     }else {
+      this.setState(state => ({ 
+        [index]: true
+      }));
+     }
    }
+   
   
  };
 
@@ -355,7 +366,6 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
       {this.state.actor==="teacher" ? (
         
         <div>
-        <ReviewPanel AllReview={this.state.allR} AnyRev={this.state.totalR}/>
         {this.state.addChapter ? (
 <div style={{padding:'12px 0 0 12px'}}>
  
