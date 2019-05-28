@@ -52,15 +52,28 @@ class subjectHome extends React.Component {
    isChapNumberError:false,
    isLectNameError:false,
    isLectNumberError:false,
-   subid:this.props.location.state.subid,
-   actor:this.props.location.state.actor,
-   subname:this.props.location.state.subname,
+   subid:"",
+   actor:"",
+   subname:"",
    oldIndex:null
   };
   this.openLecture=this.openLecture.bind(this);
  }
 
- 
+ componentWillReceiveProps = (nextProps) =>{
+   if(typeof(nextProps.location.state.subid) !== 'undefined'){
+    this.setState({
+      subid:nextProps.location.state.subid,
+      actor:nextProps.location.state.actor,
+      subname:nextProps.location.state.subname
+    });
+   }else{
+    this.setState({
+      subid:"undefined"
+    });
+   }
+ }
+
  componentDidMount = () => {
 
   this.checkUserID();
