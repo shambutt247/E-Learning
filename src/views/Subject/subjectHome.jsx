@@ -59,6 +59,8 @@ class subjectHome extends React.Component {
   };
   this.openLecture=this.openLecture.bind(this);
  }
+
+ 
  componentDidMount = () => {
 
   this.checkUserID();
@@ -87,12 +89,26 @@ checkUserID =()=>{
 
     fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
       if(snapshot.val().userType==="teacher" || snapshot.val().userType==="student" || snapshot.val().userType==="admin"){
-        return ;
+        
+  if(typeof this.state.subid==="undefined"){
+    if(snapshot.val().userType==="teacher"){
+      history.push('/home-teacher');
+    } else if(snapshot.val().userType==="student"){
+      history.push('/home-student');
+    } else if(snapshot.val().userType==="admin"){
+      history.push('/home-admin');
+    } 
+
+  }else{
+    return ;
+  }
+        
       }else{
         history.push('/');
       }
     });
   }else {
+
     history.push('/');
   }
 }

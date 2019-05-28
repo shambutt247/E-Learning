@@ -1,4 +1,5 @@
 import React from "react";
+import history from "../../history";
 // nodejs library that concatenates classes
 import classNames from "classnames";
 // @material-ui/core components
@@ -34,27 +35,37 @@ class profileTeacher extends React.Component {
     };
   }
   componentDidMount = () => {
-    var user = localStorage.getItem("uid");
-    var user1 = JSON.parse(user);
-    var nameInitial = user1.displayName;
-    var acr = nameInitial.split(' ').map(x => x[0]).join('');
-    var PhtoURL = user1.photoURL
-    if (PhtoURL === null) {
+    
+    if("uid" in localStorage){
+
+      var user = localStorage.getItem("uid");
+      var user1 = JSON.parse(user);
+      var nameInitial = user1.displayName;
+      var acr = nameInitial.split(' ').map(x => x[0]).join('');
+      var PhtoURL = user1.photoURL
+      if (PhtoURL === null) {
+        this.setState({
+          ppicture: false
+        });
+      } else {
+        this.setState({
+          ppicture: true,
+          preview: PhtoURL
+        });
+      }
       this.setState({
-        ppicture: false
+        Name: user1.displayName,
+        Acr: acr
+      }, () => {
+        console.log(this.state.Name);
       });
-    } else {
-      this.setState({
-        ppicture: true,
-        preview: PhtoURL
-      });
-    }
-    this.setState({
-      Name: user1.displayName,
-      Acr: acr
-    }, () => {
-      console.log(this.state.Name);
-    });
+      
+    }else {
+      history.push('/');
+    };
+
+    
+
   }
 
   onClose = () => {
@@ -76,7 +87,6 @@ class profileTeacher extends React.Component {
 
   uploadedPicture = () => {
     let oldState = this;
-    console.log(this.state.preview);
     var user = fire.auth().currentUser;
     console.log(user);
     var Ref = fire.storage().ref();
