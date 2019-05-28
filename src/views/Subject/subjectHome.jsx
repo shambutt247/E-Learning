@@ -103,7 +103,7 @@ checkUserID =()=>{
     fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
       if(snapshot.val().userType==="teacher" || snapshot.val().userType==="student" || snapshot.val().userType==="admin"){
         
-  if(typeof this.state.subid==="undefined"){
+  if(this.state.subid==="undefined" || this.state.subid===""){
     if(snapshot.val().userType==="teacher"){
       history.push('/home-teacher');
     } else if(snapshot.val().userType==="student"){

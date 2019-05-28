@@ -50,8 +50,9 @@ class chatBox extends React.Component {
   }
 
   componentDidMount = () => {
+    if("uid" in localStorage){
 
-   var user = localStorage.getItem("uid");
+      var user = localStorage.getItem("uid");
     var user1 = JSON.parse(user);
     var nameInitial = user1.displayName;
     var userID=user1.uid;
@@ -75,7 +76,11 @@ class chatBox extends React.Component {
        messageList:allchap
       });
   });
-  
+      
+    }else {
+      history.push('/');
+    };
+
   }
 
   
