@@ -1,0 +1,10 @@
+#Redirects for netlify
+/                /home-student
+/home-student    /subject-home
+/                /home-teacher
+/home-teacher    /subject-home
+/                /home-admin
+/home-admin      /subject-home
+/subject-home    /home-teacher
+/subject-home    /home-student
+/subject-home    /home-admin
