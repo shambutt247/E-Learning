@@ -52,28 +52,16 @@ class subjectHome extends React.Component {
    isChapNumberError:false,
    isLectNameError:false,
    isLectNumberError:false,
-   subid:"",
-   actor:"",
-   subname:"",
+   subid:this.props.location.state.subid,
+   actor:this.props.location.state.actor,
+   subname:this.props.location.state.subname,
    oldIndex:null
   };
   this.openLecture=this.openLecture.bind(this);
  }
 
- componentWillReceiveProps = (nextProps) =>{
-   if(typeof(nextProps.location.state.subid) !== 'undefined'){
-    this.setState({
-      subid:nextProps.location.state.subid,
-      actor:nextProps.location.state.actor,
-      subname:nextProps.location.state.subname
-    });
-   }else{
-    history.push('/');
-   }
- }
-
+ 
  componentDidMount = () => {
-
   this.checkUserID();
 
   let currentComponent = this;
@@ -100,9 +88,7 @@ checkUserID =()=>{
 
     fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
       if(snapshot.val().userType==="teacher" || snapshot.val().userType==="student" || snapshot.val().userType==="admin"){
- 
-    return ;
-        
+        return ;
       }else{
         history.push('/');
       }
