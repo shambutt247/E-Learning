@@ -150,8 +150,8 @@ class LoginMainPage extends React.Component {
                         <TextField
                           name="password"
                           label="Password"
+                          type="password"
                           className={classes.textField}
-                          hintText="Password"
                           onChange={e => this.change(e)}
                           value={this.state.password}
                           fullWidth
