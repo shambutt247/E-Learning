@@ -37,34 +37,42 @@ class logout extends React.Component {
       };
    }
    componentDidMount = () => {
-      let old=this;
-      var userstring = localStorage.getItem("uid");
-      var user = JSON.parse(userstring);
-      var Phto=user.photoURL;
-      if(Phto===null){
-         var name=null;
-         if (user != null) {
-            name = user.displayName;
-         }
-         if(name!==null){
-            var acr=name.split(' ').map(x => x[0]).join('');
+      if("uid" in localStorage){
+
+         let old=this;
+         var userstring = localStorage.getItem("uid");
+         var user = JSON.parse(userstring);
+         var Phto=user.photoURL;
+         if(Phto===null){
+            var name=null;
+            if (user != null) {
+               name = user.displayName;
+            }
+            if(name!==null){
+               var acr=name.split(' ').map(x => x[0]).join('');
+               this.setState({
+                  profileName:acr
+               });
+            }
+         }else{
             this.setState({
-               profileName:acr
+               profImage:Phto,
+               imagep:true
             });
          }
-      }else{
-         this.setState({
-            profImage:Phto,
-            imagep:true
-         });
-      }
+   
+         fire.database().ref('users/' + user.uid).on('value', function (snapshot) {
+            var userT=snapshot.val().userType;
+            old.setState({
+               actor:userT
+            });
+          });
+         
+       }else {
+         history.push('/');
+       };
 
-      fire.database().ref('users/' + user.uid).on('value', function (snapshot) {
-         var userT=snapshot.val().userType;
-         old.setState({
-            actor:userT
-         });
-       });
+      
       
       
    }

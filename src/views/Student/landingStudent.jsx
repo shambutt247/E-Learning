@@ -31,6 +31,9 @@ import fire from '../Firebase/fire';
 class landingStudent extends React.Component {
   constructor(props) {
     super(props);
+  }
+  componentDidMount = () => {
+
     if("uid" in localStorage){
       var user = localStorage.getItem("uid");
       var userid = JSON.parse(user);
@@ -43,9 +46,6 @@ class landingStudent extends React.Component {
     }else {
       history.push('/');
     };
-  }
-  componentDidMount = () => {
-
     
   }
   
