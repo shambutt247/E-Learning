@@ -68,9 +68,7 @@ class subjectHome extends React.Component {
       subname:nextProps.location.state.subname
     });
    }else{
-    this.setState({
-      subid:"undefined"
-    });
+    history.push('/');
    }
  }
 
