@@ -37,29 +37,21 @@ class profileTeacher extends React.Component {
   componentDidMount = () => {
     
     if("uid" in localStorage){
-
+      
       var user = localStorage.getItem("uid");
       var user1 = JSON.parse(user);
       var nameInitial = user1.displayName;
       var acr = nameInitial.split(' ').map(x => x[0]).join('');
-      var PhtoURL = user1.photoURL
-      if (PhtoURL === null) {
-        this.setState({
-          ppicture: false
-        });
-      } else {
-        this.setState({
-          ppicture: true,
-          preview: PhtoURL
-        });
-      }
+      var PhtoURL = user1.photoURL;
+       
       this.setState({
         Name: user1.displayName,
+        ppicture: true,
+        preview: PhtoURL,
         Acr: acr
       }, () => {
         console.log(this.state.Name);
       });
-      
     }else {
       history.push('/');
     };
