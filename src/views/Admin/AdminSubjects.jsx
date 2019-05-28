@@ -68,15 +68,17 @@ class AdminSubjects extends React.Component {
 
   }
 
-  handleBlock = (user, status) => {
+  handleBlock = (user, status,teacher) => {
 
     var database = fire.database();
     var updates = {};
 
     if (status === "Blocked") {
       updates['subjects/' + user + '/status'] = "Active";
+      updates['users/' + teacher + '/subjects/'+user+'/status'] = "Active";
     } else {
       updates['subjects/' + user + '/status'] = "Blocked";
+      updates['users/' + teacher + '/subjects/'+user+'/status'] = "Blocked";
     }
     return database.ref().update(updates);
   }
@@ -108,14 +110,17 @@ class AdminSubjects extends React.Component {
     }
   }
 
-  handleOpenSubject = (subId,subName) => {
-    history.push({
-      pathname: '/subject-home',
-      search: '?query=abc',
-      state: {  subid: subId,
-                actor:"admin",
-                subname:subName }
-    });
+  handleOpenSubject = (subId,subName,status) => {
+    if(status!=="Blocked"){
+      history.push({
+        pathname: '/subject-home',
+        search: '?query=abc',
+        state: {  subid: subId,
+                  actor:"admin",
+                  subname:subName }
+      });
+    }
+    
   }
 
   render() {
@@ -183,7 +188,7 @@ class AdminSubjects extends React.Component {
                         <TableCell style={{ backgroundColor: backColor, whiteSpace: 'nowrap',padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.subid}</TableCell>
                         <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.subname}</TableCell>
                         <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.category}</TableCell>
-                        <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.sstrenght}</TableCell>
+                        <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.sstrenght+1}</TableCell>
                         <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>{prop.teacherid}</TableCell>
                         <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>
                           <Grid container direction="row" alignItems="center" style={{ display: '-webkit-inline-box', verticalAlign: 'text-top' }}>
@@ -200,7 +205,7 @@ class AdminSubjects extends React.Component {
                         <TableCell style={{ backgroundColor: backColor,padding:'4px 11px 4px 11px' }} className={classes.tableCell}>
                           <Grid container style={{display: '-webkit-inline-box'}}>
                             <Grid item>
-                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleBlock(prop.subid, prop.status)}>
+                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleBlock(prop.subid, prop.status,prop.teacherid)}>
                                 {prop.status === "Blocked" ? (
                                   <Check fontSize="small" />
                                 ) : (
@@ -210,7 +215,7 @@ class AdminSubjects extends React.Component {
                               </IconButton>
                             </Grid>
                             <Grid item>
-                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleOpenSubject(prop.subid,prop.subname)}>
+                              <IconButton aria-label="Delete" className={classes.margin} onClick={() => this.handleOpenSubject(prop.subid,prop.subname,prop.status)}>
                                 <ChromeReaderMode fontSize="small" />
 
                               </IconButton>

@@ -42,9 +42,11 @@ class mycoursesStudent extends React.Component {
     fire.database().ref('users/' + userid.uid + '/subjects/').on('value', function (snapshot) {
       var allsub = [];
       snapshot.forEach(function (childSnapshot) {
+        
         allsub = allsub.concat(childSnapshot.val());
       });
-      console.log(allsub);
+
+    
       currentComponent.setState({
         studentsubjects: allsub
       });
@@ -69,6 +71,7 @@ class mycoursesStudent extends React.Component {
           var updates = {};
           //database.ref('users/' + userstudent + '/subjects/' + subid).remove()
           updates['users/' + userstudent.uid + '/subjects/' + subid] = null;
+          updates['subjects/' + subid + '/allUsers/'+ userstudent.uid ] = null;
           updates['subjects/' + subid + '/sstrenght'] = str - 1;
           updates['users/' + teachid +'/subjects/' + subid + '/sstrenght'] = str - 1;
           return database.ref().update(updates);
@@ -83,13 +86,21 @@ class mycoursesStudent extends React.Component {
   }
 
   openSubject = (subjectID,subName) =>{
-    history.push({
-      pathname: '/subject-home',
-      search: '?query=abc',
-      state: {  subid: subjectID,
-                actor:"student",
-                subname:subName }
+    let nor=this;
+    fire.database().ref('subjects/' + subjectID ).on('value', function (snapshot) {
+      if(snapshot.val().status!=="Blocked"){
+        history.push({
+          pathname: '/subject-home',
+          search: '?query=abc',
+          state: {  subid: subjectID,
+                    actor:"student",
+                    subname:subName }
+        });
+      }else{
+        nor.handleSnack("Subject has been Blocked by Admin!!","error");
+      }
     });
+    
   }
 
   render() {

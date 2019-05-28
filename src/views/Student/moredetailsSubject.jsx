@@ -68,30 +68,34 @@ var mon=this.state.subo.subid;
 var str=this.state.subo.sstrenght;
 var teachid=this.state.subo.teacherid;
 var b=null
-console.log(this.state.subo.teacherid);
+
 var postSubject = {
  subname: this.state.subo.subname,
  subid:this.state.subo.subid,
  category:this.state.subo.category ,
- active:this.state.subo.active,
  teacherid:this.state.subo.teacherid
 };
+
+var userS={
+  userid:userstudent.uid
+}
+
 //var joinedDate=getDataTimeAll
   database.ref('users/' + userstudent.uid + '/subjects/' + mon ).once("value")
   .then(function(snapshot) {
     var b= snapshot.exists();// true
     if(!b){
-     if(userstudent!==null){
+
       var updates = {};
       updates['users/' + userstudent.uid + '/subjects/' + mon] = postSubject;
       updates['subjects/'+ mon + '/sstrenght']=str+1;
+      updates['subjects/'+ mon + '/allUsers/'+userstudent.uid]=userS;
       updates['users/' + teachid + '/subjects/'+ mon + '/sstrenght']=str+1;
-      //updates['subjects/'+ mon + '/studentsinfo/' + userstudent + '/joined']=joinedDate;
       curo.handleSnack("Subject Enrolled!!","success");
     
 
       return database.ref().update(updates);
-    }
+    
     }else{
       curo.handleSnack("Subject Already Enrolled!!","error");
     }

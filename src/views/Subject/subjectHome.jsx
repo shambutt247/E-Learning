@@ -101,7 +101,9 @@ checkUserID =()=>{
     var userid = JSON.parse(user);
 
     fire.database().ref('users/' + userid.uid).on('value', function (snapshot) {
-      if(snapshot.val().userType!=="teacher"){
+      if(snapshot.val().userType==="teacher" || snapshot.val().userType==="student" || snapshot.val().userType==="admin"){
+        return ;
+      }else{
         history.push('/');
       }
     });

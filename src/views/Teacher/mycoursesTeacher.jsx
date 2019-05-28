@@ -3,6 +3,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 import classNames from "classnames";
+import { withSnackbar } from 'notistack';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
@@ -53,18 +54,26 @@ class mycoursesTeacher extends React.Component {
 
   }
 
-  openSubject = (subjectID,subName) =>{
-    history.push({
-      pathname: '/subject-home',
-      search: '?query=abc',
-      state: {  subid: subjectID,
-                actor:"teacher",
-                subname:subName }
-    });
+  openSubject = (subjectID,subName,status) =>{
+    
+      if(status!=="Blocked"){
+        history.push({
+          pathname: '/subject-home',
+          search: '?query=abc',
+          state: {  subid: subjectID,
+                    actor:"teacher",
+                    subname:subName }
+        });
+      }else{
+        this.handleSnack("Subject has been Blocked by Admin!!","error");
+      }
+    
+    
   }
-  
 
-  
+  handleSnack = (mess,variant) =>{
+    this.props.enqueueSnackbar(mess, {variant});
+  }
 
   render() {
     const { classes, ...rest } = this.props;
@@ -75,11 +84,13 @@ class mycoursesTeacher extends React.Component {
        My Subjects
        </h3>
        <Grid container spacing={10} justify="space-evenly">
-        {this.state.teachersubjects.map((details) =>
-  <div key={details.subid}>
+        {this.state.teachersubjects.map((details) =>{
+          const backColor = (details.status === "Blocked") ? '#FF5454' : '#FFFFFF';
+          return (
+            <div key={details.subid}>
     <Grid item xs={5}>
   <Card style={{width:'350px',marginBottom:'30px'}} elevation={2}>
-      <CardActionArea onClick={()=>this.openSubject(details.subid, details.subname)}>
+      <CardActionArea onClick={()=>this.openSubject(details.subid, details.subname,details.status)} style={{backgroundColor: backColor}}>
         <CardMedia
           objectFit="cover"
           image={require ("assets/img/bg.jpg")}
@@ -108,6 +119,13 @@ class mycoursesTeacher extends React.Component {
 </Grid>
         </CardContent>
       </CardActionArea>
+      <CardActions style={{ justifyContent: 'center' }}>
+
+      <Button variant="outlined" color="primary" onClick={(e)=>this.handleDeleteSubject(e,details.subid)}>
+          Delete
+        </Button>
+
+                  </CardActions>
     </Card>
     </Grid>
  
@@ -117,12 +135,21 @@ class mycoursesTeacher extends React.Component {
               
             
       
-  </div>)}
+  </div>
+          );
+        }
+  )}
       
   </Grid>
       </div>
     );
   }
 }
+mycoursesTeacher.propTypes = {
+  classes: PropTypes.object.isRequired,
+  enqueueSnackbar: PropTypes.func.isRequired
+  
+};
 
-export default withStyles(profilePageStyle)(mycoursesTeacher);
+const mycoursesTeacher1 = withSnackbar(mycoursesTeacher);
+export default withStyles(profilePageStyle)(mycoursesTeacher1);

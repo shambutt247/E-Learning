@@ -76,18 +76,31 @@ class addcourseStudent extends React.Component {
   }
 
   handleMatric = () =>{
+    let ac2=this.state.allsubjects.filter(x => x.category.includes("Matric"));
+    this.setState({
+      allsubs:ac2
+    });
+
 this.setState({
 selection:"Matric"
 });
   }
 
   handleInter = () =>{
+    let ac2=this.state.allsubjects.filter(x => x.category.includes("Intermediate"));
+    this.setState({
+      allsubs:ac2
+    });
     this.setState({
     selection:"Intermediate"
     });
   }
 
   handleAll = () =>{
+    let ac2=this.state.allsubjects;
+    this.setState({
+      allsubs:ac2
+    });
     this.setState({
     selection:"All"
     });
@@ -159,10 +172,8 @@ selection:"Matric"
             
             {this.state.allsubs.map((details) =>
 
-              <Grid item xs={4}>
+              <Grid item xs={4} style={{textAlign:'center'}}>
 
-              <div style={{textAlign:'-webkit-center'}}>
-                {(this.state.selection===details.category || this.state.selection==="All") ? (
                   <div key={details.subid}>
               
                 <Card style={{ width: '350px', marginBottom: '30px' }} elevation={2}>
@@ -209,8 +220,6 @@ selection:"Matric"
                   </CardActions>
                 </Card>
               
-              </div>
-                ):(null)}
               </div>
               </Grid>
 
