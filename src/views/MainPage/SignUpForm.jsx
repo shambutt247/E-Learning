@@ -274,6 +274,7 @@ class SignUpForm extends React.Component {
                   value={this.state.passwordOne}
                   variant="outlined"
                   required
+                  type="password"
                   onChange={e => this.change(e)}
                   fullWidth
                 />
@@ -289,6 +290,7 @@ class SignUpForm extends React.Component {
                   onChange={e => this.change(e)}
                   fullWidth
                   required
+                  type="password"
                   error={this.state.isPasswordError}
                   helperText={this.state.isPasswordErrorText}
                 />
