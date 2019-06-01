@@ -152,7 +152,8 @@ selection:"Matric"
             <Button onClick={()=>this.handleAll()} color="primary" autoFocus>
               All
             </Button>
-            <TextField
+            {this.state.selection!=='none' ? (
+              <TextField
               name="search"
               placeholder="Subject Name...."
               className={classes.textField}
@@ -160,6 +161,8 @@ selection:"Matric"
               onChange={e => this.change(e)}
               value={this.state.search}
             />
+            ):(null)}
+            
        </div>
        
 

@@ -100,7 +100,8 @@ class SignUpForm extends React.Component {
           email: email,
           userType: actor,
           userID:uniqueID,
-          status:"Active"
+          status:"Active",
+          profImage:'https://firebasestorage.googleapis.com/v0/b/e-learning-5d902.appspot.com/o/images%2Fblank-profile.png?alt=media&token=fe85fb14-b4a6-4ce5-aec3-22c4e4b396ce'
         });
       })
       .then(() => {

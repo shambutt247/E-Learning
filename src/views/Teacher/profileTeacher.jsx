@@ -78,6 +78,7 @@ class profileTeacher extends React.Component {
   }
 
   uploadedPicture = () => {
+    let database=fire.database();
     let oldState = this;
     var user = fire.auth().currentUser;
     console.log(user);
@@ -99,6 +100,10 @@ class profileTeacher extends React.Component {
         user.updateProfile({
           photoURL: downloadURL
         })
+        var updates = {};
+        updates['users/' + user.uid + '/profImage'] = downloadURL;
+    
+        database.ref().update(updates);
         oldState.setState({
           uploadPicture: false
         });

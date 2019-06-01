@@ -139,9 +139,9 @@ checkUserID =()=>{
  };
 
  change = e => {
-  this.setState({
-    [e.target.name]: e.target.value
-  });
+        this.setState({
+          [e.target.name]: e.target.value
+        });
 };
 
 ClearErrors = () =>{
@@ -169,11 +169,20 @@ CheckChapterErrors=()=>{
     });
 Err=true;
   }
-  if(chapnumber===null){
+  if(chapnumber===null || chapnumber==='0'){
     this.setState({
       isChapNumberError:true
     });
 Err=true;
+  }else{
+    var gogo=chapnumber.match(/-/g);
+    if(gogo!==null){
+      this.setState({
+        isChapNumberError:true
+      });
+      Err=true;
+      this.handleSnack("Cannot be a negative number !!","error");
+    }
   }
 
   return Err
@@ -225,11 +234,20 @@ newLecture = () =>{
 Err=true;
   }
 
-  if(lectnumber===null){
+  if(lectnumber===null || lectnumber==='0'){
     this.setState({
       isLectNumberError:true
     });
 Err=true;
+  }else{
+    var gogo=lectnumber.match(/-/g);
+    if(gogo!==null){
+      this.setState({
+        isLectNumberError:true
+      });
+      Err=true;
+      this.handleSnack("Cannot be a negative number !!","error");
+    }
   }
 
   return Err
@@ -393,6 +411,11 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
                   style={{width:'200px'}}
                   required
                   error={this.state.isChapNumberError}
+                  InputProps={{
+                    inputProps:{
+                      min:1,max:40
+                    }
+                  }}
                 />
                 <Button 
                   variant="contained" 
@@ -455,10 +478,12 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
           
           {this.state[index] ? <ExpandLess /> : <ExpandMore />}
          </ListItem>
-         <Fab size="small" onClick={()=>this.DeleteChapter(chap.ChapNumber)}>
+
+         {this.state.actor==="teacher" && (
+          <Fab size="small" onClick={()=>this.DeleteChapter(chap.ChapNumber)}>
            <DeleteIcon fontSize="small" />
          </Fab>
-         
+         )}
 
          </div>
          </Paper>
@@ -546,9 +571,10 @@ DeleteLecture = (chapNumber,lectNumber,lectValue) =>{
                <ListItemText inset primary={"Lecture "+lect.LectureNumber+" , "+lect.LectureName} />
                
               </ListItem>
+              {this.state.actor==="teacher" && (
               <IconButton onClick={()=>this.DeleteLecture(chap.ChapNumber,lect.LectureNumber,chap.LectureValue)}>
               <DeleteIcon fontSize="small" />
-              </IconButton>
+              </IconButton>)}
               
          </div>
          </Paper>

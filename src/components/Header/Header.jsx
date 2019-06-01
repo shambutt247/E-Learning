@@ -84,7 +84,7 @@ class Header extends React.Component {
                 {leftLinks}
               </Hidden>
             ) : (
-              brandComponent
+              <h1 style={{marginLeft:'80px',marginTop:'0px',marginBottom:'0px',textAlign:'center'}}>{brand}</h1>
             )}
           </div>
           <Hidden smDown implementation="css">

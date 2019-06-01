@@ -9,6 +9,7 @@ import Avatar from '@material-ui/core/Avatar';
 import Star from '@material-ui/icons/Star';
 import StarBorder from '@material-ui/icons/StarBorder';
 import Grid from '@material-ui/core/Grid';
+import fire from '../Firebase/fire';
 
 class reviewPanel extends React.Component {
   state = {
@@ -17,6 +18,19 @@ class reviewPanel extends React.Component {
     AnyRev:0,
     profImage:'https://firebasestorage.googleapis.com/v0/b/e-learning-5d902.appspot.com/o/images%2Fblank-profile.png?alt=media&token=fe85fb14-b4a6-4ce5-aec3-22c4e4b396ce'
   };
+
+  handleProfImage = (userID) =>{
+    let old=this;
+    
+  
+      fire.database().ref('users/' + userID ).on('value', function (snapshot) {
+          var Prof=snapshot.val().profImage;
+          old.setState(state => ({ 
+            [userID]: Prof
+           }));
+        
+      });
+  }
 
   handleClickOpen = () => {
     this.setState({ open: true,
@@ -53,7 +67,7 @@ class reviewPanel extends React.Component {
             <Paper style={{marginBottom:'5px'}}>
               <Grid container spacing={2} >
                 <Grid item xs={2} style={{textAlign:'-webkit-center',marginTop:'7px'}}>
-
+                {this.handleProfImage(lect.userID)}
                 <Avatar src={this.state.profImage}/>
 
                 </Grid>

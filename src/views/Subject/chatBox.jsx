@@ -180,10 +180,15 @@ class chatBox extends React.Component {
                     </div>
                     <Paper style={{padding:'1px 4px',display:'flex',alignItems:'center',width:'auto'}} elevation={1}>
                     
-                    <InputBase onChange={e=>this.onChange(e)} value={this.state.textMessage} className={classes.input} placeholder="Message..." style={{width:'90%'}}/>
-      <IconButton onClick={()=>this.sendText()} className={classes.iconButton} style={{display:'flex',justifyContent:'flex-end'}}>
-        <StarBorder />
-      </IconButton>
+                    <InputBase 
+                    onChange={e=>this.onChange(e)} 
+                    value={this.state.textMessage} 
+                    className={classes.input} 
+                    placeholder="Message..." 
+                    onKeyPress={e => {if(e.key==='Enter')
+                                              this.sendText();}}
+                    style={{width:'100%',height:'48px'}}/>
+
       </Paper>
                   
                 </Paper>

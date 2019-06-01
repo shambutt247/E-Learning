@@ -127,7 +127,7 @@ class AdminTeachers extends React.Component {
             <Select
             value={this.state.searchBy}
             onChange={(event)=>this.handleChange(event)}
-            style={{width:'90px',textAlign:'center',paddingLeft:'5px'}}
+            style={{ width: '145px',textAlign:'center',paddingLeft:'5px'}}
           >
             <MenuItem value={"userID"}>User ID</MenuItem>
             <MenuItem value={"name"}>First Name</MenuItem>

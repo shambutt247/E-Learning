@@ -110,7 +110,7 @@ class LoginMainPage extends React.Component {
       <div>
         <Header
           color="transparent"
-          brand="Learning Birds !"
+          brand="Learning Birds"
           rightLinks={<SignUpForm />}
           fixed
           changeColorOnScroll={{
@@ -127,10 +127,10 @@ class LoginMainPage extends React.Component {
             backgroundPosition: "top center"
           }}
         >
-          {this.state.actorSelected ? (
+          
             <div className={classes.container}>
               <GridContainer justify="space-around" alignItems="center" spacing={16}>
-                <GridItem xs={5}>
+                <GridItem xs={5} style={{marginTop:'70px'}}>
                   <Card className={classes[this.state.cardAnimaton]}>
                     <form className={classes.form}>
                       <CardBody>
@@ -153,6 +153,8 @@ class LoginMainPage extends React.Component {
                           type="password"
                           className={classes.textField}
                           onChange={e => this.change(e)}
+                          onKeyPress={e => {if(e.key==='Enter')
+                                              this.SignInCheck();}}
                           value={this.state.password}
                           fullWidth
                           error={this.state.failedlogin}
@@ -167,11 +169,8 @@ class LoginMainPage extends React.Component {
 
                       </CardBody>
                       <CardFooter className={classes.cardFooter} justifyContent="center">
-                      {/*<Button color="info" onClick={() => this.changeActor("")}>
-                          Change Actor
-                          </Button>*/}
                         <Button color="info" onClick={this.SignInCheck}>
-                          Next
+                          Login
                           </Button>
                         
 
@@ -181,38 +180,6 @@ class LoginMainPage extends React.Component {
                 </GridItem>
               </GridContainer>
             </div>
-          ) : (
-              <div className={classes.container} >
-                <GridContainer justify="flex-end" alignItems="center" spacing={16} style={{marginTop:'100px'}} >
-                  <GridItem xs={5}>
-                  <Fab onClick={()=>this.changeActor('teacher')}  style={{ width: '200px', height: '200px' }}>
-                      <img src={profile}  style={{ borderRadius: '100%',width:'200px'}} />
-                      
-                      </Fab>
-                    <div style={{width:'200px',textAlign:'center',marginTop:'20px'}}>
-                    Teacher
-                      
-                    </div>
-
-                  </GridItem>
-                  <GridItem xs={5}>
-                  <Fab onClick={()=>this.changeActor("student")}  style={{ width: '200px', height: '200px' }}>
-                      <img src={profile}  style={{ borderRadius: '100%',width:'200px'}} />
-                      
-                      </Fab>
-                    <div style={{width:'200px',textAlign:'center',marginTop:'20px'}}>
-                    Students
-                      
-                    </div>
-                    
-                  </GridItem>
-                </GridContainer>
-              </div>
-
-
-
-
-            )}
 
         </div>
       </div>
