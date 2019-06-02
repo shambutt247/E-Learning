@@ -19,24 +19,27 @@ class reviewPanel extends React.Component {
     profImage:'https://firebasestorage.googleapis.com/v0/b/e-learning-5d902.appspot.com/o/images%2Fblank-profile.png?alt=media&token=fe85fb14-b4a6-4ce5-aec3-22c4e4b396ce'
   };
 
-  handleProfImage = (userID) =>{
+  handleProfImage = (rv) =>{
     let old=this;
     
+const qw=Object.values(rv).map((fd)=>{
+  fire.database().ref('users/' + fd.userID ).once('value').then( function (snapshot) {
+    var Prof=snapshot.val().profImage;
+    old.setState(state => ({ 
+      [fd.userID]: Prof
+     }));
   
-      fire.database().ref('users/' + userID ).on('value', function (snapshot) {
-          var Prof=snapshot.val().profImage;
-          old.setState(state => ({ 
-            [userID]: Prof
-           }));
-        
-      });
+});
+
+})
+      
   }
 
   handleClickOpen = () => {
     this.setState({ open: true,
       AnyRev:this.props.AnyRev,
     Reviews:this.props.AllReview });
-    console.log(this.props.AllReview);
+    this.handleProfImage(this.props.AllReview);
   };
 
   handleClose = () => {
@@ -67,8 +70,8 @@ class reviewPanel extends React.Component {
             <Paper style={{marginBottom:'5px'}}>
               <Grid container spacing={2} >
                 <Grid item xs={2} style={{textAlign:'-webkit-center',marginTop:'7px'}}>
-                {this.handleProfImage(lect.userID)}
-                <Avatar src={this.state.profImage}/>
+                
+                <Avatar src={this.state[lect.userID]}/>
 
                 </Grid>
                 <Grid item xs={10} style={{marginTop:'14px'}}>

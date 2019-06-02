@@ -85,9 +85,7 @@ class profileStudent extends React.Component {
   uploadedPicture = () => {
     let database=fire.database();
     let oldState = this;
-    console.log(this.state.preview);
     var user = fire.auth().currentUser;
-    console.log(user);
     var Ref = fire.storage().ref();
     var progress = null;
     var prog = Ref.child('users/' + user.uid + '/Images/profileimg.jpg').putString(this.state.preview, 'data_url');
@@ -102,7 +100,6 @@ class profileStudent extends React.Component {
     }, function () {
       // Upload completed successfully, now we can get the download URL
       prog.snapshot.ref.getDownloadURL().then(function (downloadURL) {
-        console.log('File available at', downloadURL);
         user.updateProfile({
           photoURL: downloadURL
         })
