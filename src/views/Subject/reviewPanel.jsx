@@ -21,17 +21,19 @@ class reviewPanel extends React.Component {
 
   handleProfImage = (rv) =>{
     let old=this;
-    
-const qw=Object.values(rv).map((fd)=>{
-  fire.database().ref('users/' + fd.userID ).once('value').then( function (snapshot) {
-    var Prof=snapshot.val().profImage;
-    old.setState(state => ({ 
-      [fd.userID]: Prof
-     }));
-  
-});
+    if(this.state.AnyRev!==0){
+      const qw=Object.values(rv).map((fd)=>{
+        fire.database().ref('users/' + fd.userID ).once('value').then( function (snapshot) {
+          var Prof=snapshot.val().profImage;
+          old.setState(state => ({ 
+            [fd.userID]: Prof
+           }));
+        
+      });
+      
+      })
+    }
 
-})
       
   }
 
